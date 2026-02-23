@@ -14,6 +14,7 @@ export interface SSEEvent {
   message?: string;
   elapsed?: number;
   summary?: Record<string, string>;
+  current_price?: number | null;
   agent?: string;
   report?: string;
   content?: string;
@@ -42,6 +43,7 @@ export interface AnalysisState {
   stage: Stage;
   ticker: string;
   message: string;
+  currentPrice: number | null;
   dataSummaries: Record<string, string> | null;
   agentReports: Record<string, string>;
   pmDecision: string | null;
@@ -57,6 +59,7 @@ export const INITIAL_STATE: AnalysisState = {
   stage: "idle",
   ticker: "",
   message: "",
+  currentPrice: null,
   dataSummaries: null,
   agentReports: {},
   pmDecision: null,

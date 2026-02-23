@@ -26,7 +26,7 @@ export function TickerInput({ onSubmit, disabled }: Props) {
 
   return (
     <div className="ticker-input-container">
-      <h1 className="title">Investment Committee</h1>
+      <h1 className="title">RAgent Investment Committee</h1>
       <p className="subtitle">
         AI-powered multi-agent stock analysis pipeline
       </p>

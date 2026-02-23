@@ -23,6 +23,7 @@ function reducer(state: AnalysisState, action: Action): AnalysisState {
             ...state,
             stage: "data_fetch",
             dataSummaries: e.summary ?? null,
+            currentPrice: e.current_price ?? null,
             elapsed: e.elapsed ?? state.elapsed,
             message: "Market data collected",
           };

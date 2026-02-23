@@ -25,6 +25,9 @@ export function StepDisplay({ state, onNewAnalysis }: Props) {
   return (
     <div className="step-display">
       <h2 className="analyzing-ticker">Analyzing {state.ticker}</h2>
+      {state.currentPrice != null && (
+        <p className="current-price">Current Price: ${state.currentPrice.toFixed(2)}</p>
+      )}
 
       {/* Data fetch phase */}
       {stage === "data_fetch" && !state.dataSummaries && (

@@ -86,11 +86,19 @@ async def run_pipeline_web(ticker: str) -> AsyncGenerator[Dict[str, Any], None]:
             "technical": curate_technical_summary(technical_data),
         }
 
+        # Extract current price from quant data
+        current_price = None
+        if isinstance(quant_data, dict):
+            quote = quant_data.get("quote")
+            if isinstance(quote, dict):
+                current_price = quote.get("price")
+
         yield {
             "event": "data_ready",
             "stage": "data_fetch",
             "elapsed": round(_elapsed(), 1),
             "summary": data_summaries,
+            "current_price": current_price,
         }
 
         # Archive raw data

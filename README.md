@@ -1,87 +1,31 @@
-# Investment Committee Agent Framework
+# Product Requirements Document: RAgent — Investment Committee Agent Framework
 
-AI-powered multi-agent stock analysis pipeline that generates Buy/Sell decisions using a structured 4-stage investment committee process.
+## 1. Purpose & Problem Statement
 
-**Live:** [https://ragent.spacetimelogics.com](https://ragent.spacetimelogics.com)
+**Problem**: Individual investors and small advisory teams lack access to institutional-grade investment committee processes. Professional fund managers benefit from multi-perspective analysis — quantitative valuation, sentiment research, and technical signals — followed by structured debate. Replicating this workflow manually is time-consuming, inconsistent, and subject to individual cognitive biases.
 
-## Overview
+**Solution**: RAgent automates a multi-agent investment committee using specialized LLM agents in a structured 4-stage pipeline. Each agent analyzes the same stock from a different angle, a portfolio manager synthesizes the research into a decision, a devil's advocate stress-tests the thesis, and a final decision is rendered — all within ~60 seconds.
 
-The system runs multiple specialized LLM agents through a decision pipeline:
-1. **Parallel Research** - Three agents analyze different aspects (quantitative, sentiment, technical)
-2. **Portfolio Manager Decision** - Initial Buy/Sell decision based on research
-3. **Devil's Advocate Challenge** - Contrarian analysis to stress-test the decision
-4. **Final Decision** - Portfolio Manager's final decision after considering challenges
+**Target Output**: A markdown report containing research from three independent analysts, an initial portfolio manager decision, a contrarian challenge, and a final Buy/Sell recommendation with conviction level.
 
-Available as both a **CLI tool** and a **web interface** with real-time streaming.
+**Live Instance**: [https://ragent.spacetimelogics.com](https://ragent.spacetimelogics.com)
 
-## Web Interface
+## 2. High-Level Architecture
 
-Visit [https://ragent.spacetimelogics.com](https://ragent.spacetimelogics.com) to use the app:
-
-1. Enter a stock ticker (e.g. AAPL, NVDA, TSLA)
-2. Watch the analysis unfold step-by-step in real time via SSE streaming
-3. Review the final BUY/SELL decision with expandable details for all research stages
-
-The web interface has a daily usage cap of 50 analyses to manage API costs.
-
-## Quick Start (CLI)
-
-### 1. Install Dependencies
-```bash
-pip install -r requirements.txt
-```
-
-### 2. Set Up API Keys
-Copy `.env.example` to `.env` and add your API keys:
-```bash
-cp .env.example .env
-# Edit .env with your API keys
-```
-
-Required API keys:
-- **LLM APIs**: ANTHROPIC_API_KEY, XAI_API_KEY, ZAI_API_KEY, MOONSHOT_API_KEY
-- **Data APIs**: FMP_API_KEY, FRED_API_KEY, SCRAPINGDOG_API_KEY
-
-### 3. Run Analysis
-```bash
-python run.py AAPL
-```
-
-Reports will be saved to:
-- Main report: `./reports/AAPL_YYYYMMDD_HHMMSS.md`
-- Individual agent reports: `./reports/agent-research/AAPL_<agent>_YYYYMMDD_HHMMSS.md`
-
-### 4. Run Web Server (Local)
-```bash
-# Build frontend
-cd frontend && npm ci && npm run build && cd ..
-
-# Start server
-python api_server.py
-# Open http://localhost:8000
-```
-
-## Usage Examples
-
-```bash
-# Basic usage
-python run.py AAPL
-
-# Custom output directory
-python run.py TSLA --output-dir ./my-reports
-
-# Quiet mode (no progress output)
-python run.py MSFT --quiet
-```
-
-## Pipeline Architecture
+**Pipeline Flow**:
+1. **Data Collection** — Concurrent fetching from FMP (MCP), FRED (REST), Scraping Dog (REST)
+2. **Data Curation** — Raw API responses converted to concise analyst-readable summaries
+3. **Parallel Research** — Three specialized LLM agents analyze quant, sentiment, and technical data simultaneously
+4. **Portfolio Manager Decision** — Synthesizes three research reports into a Buy/Sell decision
+5. **Devil's Advocate Challenge** — Builds the strongest case for the opposite position
+6. **Final Decision** — Portfolio Manager issues a final ruling after considering the contrarian arguments
 
 ```
 Stage 1: Parallel Research (asyncio.gather)
 ┌─────────────────┬─────────────────┬─────────────────┐
-│ Quant Valuation │ Sentiment Search│ Technical Signals│
-│ (Grok 4.1)      │ (GLM-5)        │ (Kimi K2.5)     │
-└────────┬────────┴────────┬────────┴────────┬────────┘
+│ Quant Valuation  │ Sentiment Search│ Technical Signals│
+│ (Grok 4.1)       │ (GLM-5)        │ (Kimi K2.5)     │
+└────────┬─────────┴────────┬────────┴────────┬────────┘
          └─────────────────┼──────────────────┘
                            ▼
 Stage 2: Portfolio Manager Decision (Claude Opus 4.6)
@@ -93,183 +37,207 @@ Stage 3: Devil's Advocate (Claude Sonnet 4.6)
 Stage 4: Final Decision (Claude Opus 4.6)
 ```
 
-## Testing
+**Key Components**:
+- **Data Layer** (`data.py`): Async data fetching via MCP and REST with source logging
+- **Curation Layer** (`curation.py`): Converts raw API responses to role-specific text summaries
+- **Agent Layer** (`agents.py`): Unified interface for Anthropic and OpenAI-compatible LLM calls
+- **Prompt Layer** (`prompts.py`): Structured prompt templates for each pipeline stage
+- **Report Layer** (`report.py`): Markdown report generation with source audit trail
+- **Web Layer** (`api_server.py`, `pipeline_web.py`): FastAPI server with SSE streaming
+- **Frontend** (`frontend/`): React SPA with real-time step-by-step display
 
-Run tests with pytest:
-```bash
-# Run all tests
-pytest
+## 3. Data Sources
 
-# Run specific test file
-pytest tests/test_models.py -v
+**Financial Modeling Prep (FMP) — via MCP Protocol**:
+- **Core Statements**: Quote, income statement, balance sheet, cash flow (annual, 5 periods)
+- **Valuation & Ratios**: Metrics-ratios, key-metrics, enterprise values (annual)
+- **Growth**: Financial statement growth metrics
+- **Analyst Data**: Financial estimates, price target summary, grades summary, price target consensus
+- **Valuation Models**: DCF advanced, DCF levered
+- **Health Scores**: Altman Z-Score, Piotroski Score
+- **TTM Data**: Income statements TTM, key metrics TTM
+- **Sector Comparison**: Sector PE snapshot, industry PE snapshot
+- **Segmentation**: Revenue product segmentation
+- **Sentiment**: Stock news (10 articles), press releases (5), insider trade statistics
+- **Technical**: Historical price EOD (400 days), RSI(14), SMA(50), SMA(200), EMA(20), quote change
 
-# Run with coverage
-pytest --cov=. --cov-report=html
-```
-
-### Data Testing Scripts
-Test individual components:
-```bash
-# Test all data fetching functions
-python test_data_fetch.py
-
-# Test simple pipeline (data only)
-python test_simple_pipeline.py
-
-# Test enhanced data endpoints specifically
-python test_enhanced_data.py
-
-# Test individual FMP endpoints
-python test_fmp_simple.py
-```
-
-## Project Structure
-
-```
-project-ragent/
-├── run.py              # CLI entry point and pipeline orchestrator
-├── api_server.py       # FastAPI web server (SSE streaming)
-├── pipeline_web.py     # Web pipeline wrapper (async generator)
-├── rate_limit.py       # Daily usage counter for web API
-├── agents.py           # LLM agent call functions
-├── data.py             # Data fetching from APIs (MCP + REST)
-├── curation.py         # Data curation layer (raw → summaries)
-├── models.py           # Model registry and configuration
-├── prompts.py          # Agent prompt templates
-├── report.py           # Report generation and markdown output
-├── frontend/           # React + Vite + TypeScript SPA
-│   ├── src/
-│   │   ├── App.tsx
-│   │   ├── hooks/useAnalysis.ts   # SSE connection + state machine
-│   │   └── components/            # UI components
-│   └── dist/           # Production build (gitignored)
-├── deploy/             # EC2 deployment config
-│   ├── setup.sh        # Ubuntu provisioning script
-│   ├── nginx.conf      # Reverse proxy with SSE support
-│   ├── ragent.service  # systemd unit file
-│   └── .env.production # API key template
-├── tests/              # Test suite (26 tests)
-├── reports/            # Generated reports (gitignored)
-├── requirements.txt    # Python dependencies
-├── .env.example        # API key template
-└── README.md           # This file
-```
-
-## Recent Enhancements (February 2026)
-
-### 🚀 **Enhanced Data Pipeline**
-Upgraded from basic FMP v3 endpoints to comprehensive FMP Stable API coverage:
-
-- **19 total data fields** (up from 12)
-- **16+ FMP endpoints** for complete financial analysis
-- **Balance sheet data**: $359B assets, $112B debt analysis for AAPL
-- **DCF valuations**: Intrinsic value calculations vs market price
-- **Financial health scores**: Bankruptcy prediction, financial strength
-- **TTM metrics**: Trailing twelve months performance data
-
-### 🔄 **API Migration Completed**
-Successfully migrated from deprecated FMP v3 API to stable endpoints after August 2025 deprecation.
-
-### 📊 **Research Agent Improvements**
-Enhanced prompts to leverage richer data:
-- Quantitative agents now analyze balance sheet strength, financial scores, DCF models
-- Sentiment agents incorporate analyst price targets and estimate trends
-- Technical agents have access to comprehensive historical data
-
-## API Documentation
-
-### Data Sources
-
-#### Financial Modeling Prep (FMP) - Enhanced API Coverage
-Using FMP Stable API endpoints for comprehensive financial data:
-
-**Core Financial Statements:**
-- Quote data (price, volume, market cap, price changes)
-- Income statements (annual periods)
-- Balance sheet statements (assets, liabilities, equity)
-- Cash flow statements (operating, investing, financing)
-
-**Valuation & Ratios:**
-- Financial ratios (P/E, P/B, debt/equity, ROE)
-- Key metrics (annual periods)
-- Enterprise values (EV, EV/EBITDA, EV/Sales)
-- Financial growth metrics
-
-**Analyst & Market Data:**
-- Analyst estimates (revenue, earnings forecasts)
-- Price target summary (high, low, average targets)
-- Company profile data
-
-**Advanced Valuation Models:**
-- Discounted Cash Flow (DCF) valuations
-- Advanced levered DCF models
-
-**Financial Health Scores:**
-- Altman Z-Score (bankruptcy prediction)
-- Piotroski Score (financial strength)
-
-**Trailing Twelve Months (TTM) Data:**
-- TTM income statements (quarterly data)
-- TTM key metrics for recent performance
-
-#### FRED (Federal Reserve Economic Data)
+**FRED (Federal Reserve Economic Data) — REST API**:
 - Federal Funds Rate (DFF)
-- 10Y-2Y Treasury Yield Spread (T10Y2Y) 
+- 10Y-2Y Treasury Yield Spread (T10Y2Y)
 - VIX Volatility Index (VIXCLS)
 
-#### Scraping Dog (Google Search API)
-- Analyst rating searches
-- News sentiment analysis
-- Risk and headwind identification
+**Scraping Dog (Google Search) — REST API**:
+- `"{ticker} stock analyst rating 2025"` — analyst consensus signals
+- `"{ticker} stock news sentiment"` — recent news themes
+- `"{ticker} stock risks headwinds"` — risk narratives
 
-### LLM Models
-- **Claude Opus 4.6**: Portfolio Manager decisions
-- **Claude Sonnet 4.6**: Devil's Advocate analysis
-- **Grok 4.1 Thinking**: Quantitative research
-- **GLM-5**: Sentiment analysis
-- **Kimi K2.5**: Technical analysis
+**Data Quality Features**:
+- MCP calls wrapped in `_safe_mcp()` with graceful failure (returns defaults on error)
+- REST calls with retry logic and exponential backoff on 429 responses
+- Field name normalization layer (`_normalize_quant_data()`) mapping MCP field names to pipeline-expected names
+- Per-request `SourceLogger` instances for concurrent web request isolation
+- Manual fallback calculations for RSI, SMA, support/resistance when MCP indicators fail
 
-## Output Format
+## 4. Technical Requirements
 
-### Main Report
-The consolidated report (`./reports/TICKER_YYYYMMDD_HHMMSS.md`) contains:
-- Timestamp and duration metrics
-- Three research reports (Stage 1)
-- Portfolio Manager initial decision (Stage 2)
-- Devil's Advocate challenge (Stage 3)
-- Final investment decision (Stage 4)
-- Comprehensive source log of all API calls made
+**System Requirements**:
+- Python 3.12.7
+- Node.js 22 LTS (frontend build)
+- AWS EC2 `t3.medium` (2 vCPU, 4GB RAM, 20GB gp3) for production
+- Single async worker (MCP client is not multi-process safe)
 
-### Individual Agent Reports
-Each agent's output is also saved separately in `./reports/agent-research/`:
-- `TICKER_quant_YYYYMMDD_HHMMSS.md` - Quantitative Valuation Research
-- `TICKER_sentiment_YYYYMMDD_HHMMSS.md` - Sentiment Research
-- `TICKER_technical_YYYYMMDD_HHMMSS.md` - Technical Signals Research
-- `TICKER_portfolio_manager_stage2_YYYYMMDD_HHMMSS.md` - PM Initial Decision
-- `TICKER_devil_advocate_YYYYMMDD_HHMMSS.md` - Devil's Advocate Challenge
-- `TICKER_final_decision_YYYYMMDD_HHMMSS.md` - PM Final Decision
+**Core Libraries — Backend**:
+- **LLM SDKs**: anthropic (Claude), openai (Grok, GLM-5, Kimi K2.5 via OpenAI-compat)
+- **MCP Client**: fastmcp (FMP data via Model Context Protocol)
+- **Async HTTP**: aiohttp (FRED, Scraping Dog REST calls)
+- **Web Framework**: FastAPI, uvicorn (SSE streaming)
+- **Configuration**: python-dotenv (.env file management)
+- **Testing**: pytest, pytest-asyncio, pytest-mock, aioresponses
 
-### Enhanced Data Analysis
-The quantitative research now leverages comprehensive financial data:
-- **Balance sheet analysis**: Asset quality, debt levels, equity strength
-- **Advanced valuation**: DCF models, enterprise value calculations
-- **Financial health scoring**: Altman Z-Score, Piotroski Score
-- **TTM performance**: Recent quarterly trends and metrics
-- **Analyst consensus**: Price targets, earnings estimates
-- **Macro integration**: Interest rates, yield curves, market volatility
+**Core Libraries — Frontend**:
+- **UI**: React 19, TypeScript
+- **Build**: Vite 6
+- **Markdown**: marked (rendering agent reports)
 
-## Rate Limiting
+**Development Tools**:
+- Version control: Git + GitHub
+- AI coding assistant: Claude Code
+- Environment: Virtual environments (.venv)
 
-The system includes automatic rate limiting:
-- 1-second delay between calls to the same API provider
-- Exponential backoff for rate limit errors (429 responses)
-- 120-second timeout per agent call
+**Infrastructure**:
+- Development: Local Python + Vite dev server with proxy
+- Production: AWS EC2, nginx reverse proxy, systemd service
+- SSE streaming: `proxy_buffering off` in nginx for real-time event delivery
+- Rate limiting: File-based daily counter (`./data/usage.json`), 50 analyses/day
 
-## Error Handling
+## 5. Agent Specifications
 
-- Continues pipeline if individual research agents fail
-- Logs errors and includes error notices in reports
-- Validates all API keys before starting
-- Creates output directory if it doesn't exist
-- Handles mixed API response formats (lists vs dictionaries)
-- Comprehensive source logging for audit trails
+**Model Registry**:
+
+| Role | Model | Provider | Interface | Max Tokens |
+|------|-------|----------|-----------|------------|
+| Portfolio Manager (Stages 2 & 4) | Claude Opus 4.6 | Anthropic | Native SDK | 2,000 |
+| Devil's Advocate (Stage 3) | Claude Sonnet 4.6 | Anthropic | Native SDK | 2,000 |
+| Quant Valuation Researcher | Grok 4.1 Thinking | xAI | OpenAI-compat | 8,192 |
+| Sentiment Researcher | GLM-5 | Zhipu | OpenAI-compat | 2,000 |
+| Technical Signals Researcher | Kimi K2.5 | Moonshot | OpenAI-compat | 8,192 |
+
+**Agent Anonymity**: Agents refer to each other only by role name. No model names, provider names, or API details appear in any prompt.
+
+**Thinking Model Handling**: Grok 4.1 and Kimi K2.5 may return `<think>...</think>` blocks. These are stripped via regex before downstream consumption.
+
+**Output Constraints**: Each agent targets a 200-word limit. Responses exceeding 250 words trigger a warning but are not truncated.
+
+**Research Agent Output Format**:
+- Key findings from analysis
+- Investment opinion: Strong Buy / Buy / Neutral / Sell / Strong Sell
+- 2-3 supporting bullet points
+- 1-2 risk bullets
+
+**Portfolio Manager Output Format**:
+- Decision: BUY or SELL
+- Conviction level: High / Medium / Low
+- Summary rationale
+- Key risk to monitor
+- Position sizing guidance
+
+**Devil's Advocate Output Format**:
+- Specific weaknesses in PM's reasoning
+- Counter-evidence from data
+- Contrarian recommendation with supporting arguments
+- Conditions under which PM's original thesis would be correct
+
+## 6. Web Interface Specifications
+
+**API Endpoints**:
+- `POST /api/analyze` — Accepts `{"ticker": "AAPL"}`, returns SSE event stream
+- `GET /api/usage` — Returns `{count, limit, remaining}`
+- `GET /` — Serves React SPA from `frontend/dist/`
+
+**SSE Event Flow**:
+```
+status(data_fetch) → data_ready → status(research) → agent_done×3
+→ status(pm_decision) → stage_done(pm) → status(da_challenge)
+→ stage_done(da) → status(final_decision) → stage_done(final) → complete
+```
+
+**Concurrency Guards**:
+- Duplicate ticker analysis blocked via `_active_tickers` set
+- Per-request `SourceLogger` prevents source log pollution between concurrent analyses
+- 1-second per-provider rate limiting on LLM API calls
+
+**Frontend State Machine**:
+- `idle` → `data_fetch` → `research` → `pm_decision` → `da_challenge` → `final_decision` → `complete`
+- Error state reachable from any stage
+- SSE connection via `fetch()` + `ReadableStream` (not `EventSource`, which only supports GET)
+
+**UI Design**:
+- Dark theme (`#0a0a0f` background), monospace system font
+- Green/red accent for BUY/SELL decisions
+- Sequential step display: each stage replaces the previous with a fade transition
+- Final view: hero BUY/SELL card with expandable `<details>` for all reports and data sources
+
+## 7. Success Metrics
+
+**Pipeline Reliability**:
+- All 3 research agents complete successfully (graceful degradation if one fails)
+- End-to-end pipeline execution under 120 seconds
+- 26 unit tests passing across all modules
+
+**Data Completeness**:
+- Zero N/A values for core financial fields (P/E, EPS, margins, ratios, estimates, price targets)
+- Source log captures every external API call with timestamp
+- Field name normalization handles all known MCP-to-legacy field mappings
+
+**Web Interface**:
+- SSE events stream without buffering (nginx `proxy_buffering off`)
+- Daily usage cap enforced atomically via file lock
+- Concurrent analyses of different tickers isolated correctly
+
+## 8. Monitoring & Observability
+
+**Source Logging**:
+Every external API call is logged with source name, data type, URL, and timestamp. The complete source log is:
+- Rendered as a table in the final markdown report
+- Returned in the `complete` SSE event for the web interface
+- Scoped per-request (web) or per-pipeline-run (CLI)
+
+**Progress Output (CLI)**:
+```
+[00:00] Starting Investment Committee analysis for AAPL...
+[00:01] Connecting to FMP MCP server & fetching market data...
+[00:08] Data fetched successfully
+[00:08] Stage 1: Running parallel research agents...
+[00:14]   → Quantitative Valuation Researcher... done (6.2s)
+[00:14]   → Sentiment Researcher... done (5.8s)
+[00:14]   → Technical Signals Researcher... done (6.1s)
+[00:14] Stage 2: Portfolio Manager decision...
+[00:20] Stage 3: Devil's Advocate challenge...
+[00:28] Stage 4: Final decision...
+[00:34] Report saved: ./reports/AAPL_20260223_143022.md
+```
+
+**Error Handling**:
+- Individual agent timeouts (120s) do not crash the pipeline
+- Failed research agents produce an error placeholder; PM notes missing research
+- MCP call failures return safe defaults (empty dict/list)
+- Rate limit errors (429) trigger exponential backoff (up to 3 retries)
+
+**Data Quality Checks**:
+- Word count warnings for agent responses exceeding 250 words
+- Data archive saved for every pipeline run (`reports/agent-research/`)
+- Individual agent reports saved separately for audit
+
+## 9. Scope & Deliverables
+
+**Version 1.0 (Current)**:
+- Coverage: Any US-listed stock ticker (1-5 characters)
+- Interfaces: CLI (`python run.py AAPL`) and web (SSE streaming)
+- Output: Markdown report with 4-stage pipeline results and source log
+- Deployment: AWS EC2 with nginx, systemd, Let's Encrypt SSL
+- Rate limiting: 50 analyses per day (web interface)
+
+**Future Enhancements**:
+- Historical analysis comparison (track decisions over time)
+- Portfolio-level analysis (multiple tickers, correlation)
+- Custom agent configuration (swap models, adjust prompts)

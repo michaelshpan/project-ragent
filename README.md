@@ -1,6 +1,8 @@
 # Investment Committee Agent Framework
 
-A CLI-based investment committee that generates Buy/Sell decisions for stocks using multiple LLM agents in a structured 4-stage pipeline.
+AI-powered multi-agent stock analysis pipeline that generates Buy/Sell decisions using a structured 4-stage investment committee process.
+
+**Live:** [https://ragent.spacetimelogics.com](https://ragent.spacetimelogics.com)
 
 ## Overview
 
@@ -10,7 +12,19 @@ The system runs multiple specialized LLM agents through a decision pipeline:
 3. **Devil's Advocate Challenge** - Contrarian analysis to stress-test the decision
 4. **Final Decision** - Portfolio Manager's final decision after considering challenges
 
-## Quick Start
+Available as both a **CLI tool** and a **web interface** with real-time streaming.
+
+## Web Interface
+
+Visit [https://ragent.spacetimelogics.com](https://ragent.spacetimelogics.com) to use the app:
+
+1. Enter a stock ticker (e.g. AAPL, NVDA, TSLA)
+2. Watch the analysis unfold step-by-step in real time via SSE streaming
+3. Review the final BUY/SELL decision with expandable details for all research stages
+
+The web interface has a daily usage cap of 50 analyses to manage API costs.
+
+## Quick Start (CLI)
 
 ### 1. Install Dependencies
 ```bash
@@ -36,6 +50,16 @@ python run.py AAPL
 Reports will be saved to:
 - Main report: `./reports/AAPL_YYYYMMDD_HHMMSS.md`
 - Individual agent reports: `./reports/agent-research/AAPL_<agent>_YYYYMMDD_HHMMSS.md`
+
+### 4. Run Web Server (Local)
+```bash
+# Build frontend
+cd frontend && npm ci && npm run build && cd ..
+
+# Start server
+python api_server.py
+# Open http://localhost:8000
+```
 
 ## Usage Examples
 
@@ -103,24 +127,29 @@ python test_fmp_simple.py
 
 ```
 project-ragent/
-├── run.py              # Main CLI entry point
+├── run.py              # CLI entry point and pipeline orchestrator
+├── api_server.py       # FastAPI web server (SSE streaming)
+├── pipeline_web.py     # Web pipeline wrapper (async generator)
+├── rate_limit.py       # Daily usage counter for web API
 ├── agents.py           # LLM agent call functions
-├── data.py             # Data fetching from APIs
+├── data.py             # Data fetching from APIs (MCP + REST)
+├── curation.py         # Data curation layer (raw → summaries)
 ├── models.py           # Model registry and configuration
 ├── prompts.py          # Agent prompt templates
-├── report.py           # Report generation
-├── tests/              # Test suite
-│   ├── test_data.py
-│   ├── test_models.py
-│   ├── test_agents.py
-│   ├── test_report.py
-│   └── test_pipeline.py
-├── reports/            # Generated reports
-│   └── agent-research/ # Individual agent reports
-├── test_data_fetch.py  # Data fetching integration test
-├── test_simple_pipeline.py # Pipeline data test
-├── test_enhanced_data.py   # Enhanced endpoints test
-├── test_fmp_simple.py     # FMP endpoint test
+├── report.py           # Report generation and markdown output
+├── frontend/           # React + Vite + TypeScript SPA
+│   ├── src/
+│   │   ├── App.tsx
+│   │   ├── hooks/useAnalysis.ts   # SSE connection + state machine
+│   │   └── components/            # UI components
+│   └── dist/           # Production build (gitignored)
+├── deploy/             # EC2 deployment config
+│   ├── setup.sh        # Ubuntu provisioning script
+│   ├── nginx.conf      # Reverse proxy with SSE support
+│   ├── ragent.service  # systemd unit file
+│   └── .env.production # API key template
+├── tests/              # Test suite (26 tests)
+├── reports/            # Generated reports (gitignored)
 ├── requirements.txt    # Python dependencies
 ├── .env.example        # API key template
 └── README.md           # This file

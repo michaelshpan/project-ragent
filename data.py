@@ -173,6 +173,135 @@ def _calculate_support_resistance(historical: List[Dict]) -> Dict[str, Any]:
     }
 
 
+# ── MCP field-name normalization ──────────────────────────────────────────────
+# The FMP MCP server returns slightly different field names than the legacy
+# REST v3 API.  The functions below add the expected aliases so that
+# report.py and curation.py work without changes.
+
+
+def _normalize_quant_data(
+    quote: dict,
+    income: list,
+    cash_flow: list,
+    ratios: list,
+    key_metrics: list,
+    analyst_estimates,
+    price_targets: dict,
+) -> None:
+    """Mutate the raw MCP dicts in-place, adding expected field aliases."""
+
+    # ── Quote: add pe / eps from ratios / income ─────────────────────────
+    if isinstance(quote, dict):
+        if quote.get("pe") is None:
+            r0 = ratios[0] if isinstance(ratios, list) and ratios else {}
+            if isinstance(r0, dict):
+                quote["pe"] = r0.get("priceToEarningsRatio")
+        if quote.get("eps") is None:
+            i0 = income[0] if isinstance(income, list) and income else {}
+            if isinstance(i0, dict):
+                quote["eps"] = i0.get("epsDiluted") or i0.get("eps")
+
+    # ── Income statements: compute margin ratios ─────────────────────────
+    for stmt in (income if isinstance(income, list) else []):
+        if not isinstance(stmt, dict):
+            continue
+        rev = stmt.get("revenue")
+        if rev and rev != 0:
+            if stmt.get("grossProfitRatio") is None and stmt.get("grossProfit") is not None:
+                stmt["grossProfitRatio"] = stmt["grossProfit"] / rev
+            if stmt.get("netIncomeRatio") is None and stmt.get("netIncome") is not None:
+                stmt["netIncomeRatio"] = stmt["netIncome"] / rev
+
+    # ── Cash flow: alias investing / financing fields ────────────────────
+    for stmt in (cash_flow if isinstance(cash_flow, list) else []):
+        if not isinstance(stmt, dict):
+            continue
+        if stmt.get("netCashUsedForInvestingActivites") is None:
+            stmt["netCashUsedForInvestingActivites"] = stmt.get(
+                "netCashProvidedByInvestingActivities"
+            )
+        if stmt.get("netCashUsedProvidedByFinancingActivities") is None:
+            stmt["netCashUsedProvidedByFinancingActivities"] = stmt.get(
+                "netCashProvidedByFinancingActivities"
+            )
+
+    # ── Ratios (metrics-ratios): alias field names ───────────────────────
+    for row in (ratios if isinstance(ratios, list) else []):
+        if not isinstance(row, dict):
+            continue
+        _alias(row, "priceEarningsRatio", "priceToEarningsRatio")
+        _alias(row, "enterpriseValueOverEBITDA", "enterpriseValueMultiple")
+        _alias(row, "debtEquityRatio", "debtToEquityRatio")
+        # ROE / ROA live in key-metrics; copy from the matching period
+        km_row = _match_period(key_metrics, row.get("date"))
+        if km_row:
+            _alias(row, "returnOnEquity", source=km_row)
+            _alias(row, "returnOnAssets", source=km_row)
+
+    # ── Key metrics: pull per-share data from ratios ─────────────────────
+    for row in (key_metrics if isinstance(key_metrics, list) else []):
+        if not isinstance(row, dict):
+            continue
+        r_row = _match_period(ratios, row.get("date"))
+        if r_row:
+            for field in (
+                "revenuePerShare",
+                "freeCashFlowPerShare",
+                "bookValuePerShare",
+                "dividendYield",
+            ):
+                _alias(row, field, source=r_row)
+
+    # ── Analyst estimates: alias field names ──────────────────────────────
+    est_list = analyst_estimates if isinstance(analyst_estimates, list) else (
+        [analyst_estimates] if isinstance(analyst_estimates, dict) and analyst_estimates else []
+    )
+    for row in est_list:
+        if not isinstance(row, dict):
+            continue
+        _alias(row, "estimatedRevenueAvg", "revenueAvg")
+        _alias(row, "estimatedRevenueLow", "revenueLow")
+        _alias(row, "estimatedRevenueHigh", "revenueHigh")
+        _alias(row, "estimatedEpsAvg", "epsAvg")
+        _alias(row, "estimatedEpsLow", "epsLow")
+        _alias(row, "estimatedEpsHigh", "epsHigh")
+
+    # ── Price targets: restructure summary into expected shape ────────────
+    if isinstance(price_targets, list) and price_targets:
+        # Unwrap single-item list (common MCP pattern)
+        pt = price_targets[0] if isinstance(price_targets[0], dict) else {}
+        price_targets.clear()
+        price_targets.extend([pt])  # keep it as a list so callers can unwrap
+    pt = price_targets[0] if isinstance(price_targets, list) and price_targets else price_targets
+    if isinstance(pt, dict) and pt:
+        if pt.get("priceTargetAverage") is None:
+            pt["priceTargetAverage"] = pt.get("lastYearAvgPriceTarget")
+        if pt.get("lastPrice") is None and isinstance(quote, dict):
+            pt["lastPrice"] = quote.get("price")
+
+
+def _alias(row: dict, target: str, source_key: str | None = None, source: dict | None = None) -> None:
+    """If *target* is missing from *row*, copy from *source* (or from *row* itself using *source_key*)."""
+    if row.get(target) is not None:
+        return
+    src = source or row
+    key = source_key or target
+    val = src.get(key)
+    if val is not None:
+        row[target] = val
+
+
+def _match_period(rows: list, date: str | None) -> dict | None:
+    """Find the row in *rows* whose date matches *date* (YYYY-MM-DD prefix)."""
+    if not date or not isinstance(rows, list):
+        return None
+    prefix = str(date)[:10]
+    for r in rows:
+        if isinstance(r, dict) and str(r.get("date", ""))[:10] == prefix:
+            return r
+    return rows[0] if rows and isinstance(rows[0], dict) else None
+
+
 # ── Fetch functions ───────────────────────────────────────────────────────────
 
 
@@ -254,6 +383,17 @@ async def fetch_quant_data(ticker: str, fmp_client: Client | None = None, logger
             return float(resp.get("observations", [{}])[0].get("value", 0))
         except (IndexError, TypeError, ValueError):
             return 0
+
+    # ── Normalize MCP field names to match pipeline expectations ─────────
+    _normalize_quant_data(
+        quote,
+        income if not isinstance(income, Exception) else [],
+        cash_flow if not isinstance(cash_flow, Exception) else [],
+        ratios if not isinstance(ratios, Exception) else [],
+        key_metrics if not isinstance(key_metrics, Exception) else [],
+        analyst_estimates if not isinstance(analyst_estimates, Exception) else [],
+        price_targets if not isinstance(price_targets, Exception) else {},
+    )
 
     return {
         "ticker": ticker,

@@ -1,0 +1,18 @@
+[Unit]
+Description=Investment Committee Web Server
+After=network.target
+
+[Service]
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/opt/ragent
+Environment="PATH=/opt/ragent/.venv/bin:/usr/bin"
+EnvironmentFile=/opt/ragent/.env
+ExecStart=/opt/ragent/.venv/bin/uvicorn api_server:app --workers 1 --host 127.0.0.1 --port 8000
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

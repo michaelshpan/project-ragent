@@ -45,7 +45,11 @@ async def analyze(req: AnalyzeRequest):
     if not allowed:
         raise HTTPException(
             status_code=429,
-            detail=f"Daily analysis limit reached ({count}/{limit}). Try again tomorrow.",
+            detail=(
+                "Sorry, we've hit the daily limit! "
+                "The analysts and PM have gone to enjoy a few drinks at the pub. "
+                "Please come back tomorrow for more."
+            ),
         )
 
     # Guard against concurrent analyses of the same ticker

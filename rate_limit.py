@@ -5,7 +5,7 @@ import threading
 from pathlib import Path
 from datetime import date
 
-DAILY_LIMIT = 50
+DAILY_LIMIT = 100
 _USAGE_FILE = Path("./data/usage.json")
 _lock = threading.Lock()
 

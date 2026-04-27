@@ -1,0 +1,1593 @@
+
+=== ESG ===
+description: ESG (Environmental, Social, Governance) ratings and benchmarks. Look up ESG scores by symbol or compare across the market by year.
+
+Endpoints:
+- esg-benchmark: ESG Benchmark Comparison
+- esg-ratings (symbol): ESG Ratings
+- esg-search (symbol): ESG Investment Search
+inputSchema:
+{
+  "type": "object",
+  "properties": {
+    "endpoint": {
+      "type": "string",
+      "enum": [
+        "esg-benchmark",
+        "esg-ratings",
+        "esg-search"
+      ],
+      "description": "The specific endpoint to call. See tool description for available endpoints."
+    },
+    "year": {
+      "type": "number"
+    },
+    "symbol": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "endpoint"
+  ],
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}
+
+=== Fundraisers ===
+description: Crowdfunding campaigns and equity offerings from SEC filings. Search by company name or CIK, or browse the latest filings.
+
+Endpoints:
+- crowdfunding-by-cik (cik): Crowdfunding By CIK
+- crowdfunding-search (name): Crowdfunding Campaign Search
+- equity-offering-by-cik (cik): Equity Offering By CIK
+- equity-offering-search (name): Equity Offering Search
+- latest-crowdfunding: Latest Crowdfunding Campaigns
+- latest-equity-offering: Equity Offering Updates
+inputSchema:
+{
+  "type": "object",
+  "properties": {
+    "endpoint": {
+      "type": "string",
+      "enum": [
+        "crowdfunding-by-cik",
+        "crowdfunding-search",
+        "equity-offering-by-cik",
+        "equity-offering-search",
+        "latest-crowdfunding",
+        "latest-equity-offering"
+      ],
+      "description": "The specific endpoint to call. See tool description for available endpoints."
+    },
+    "cik": {
+      "type": "number"
+    },
+    "name": {
+      "type": "string"
+    },
+    "page": {
+      "type": "number"
+    },
+    "limit": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "endpoint"
+  ],
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}
+
+=== analyst ===
+description: Analyst ratings, price targets, and financial estimates. Get current and historical stock grades, consensus price targets, and EPS/revenue estimates by symbol.
+
+Endpoints:
+- financial-estimates (symbol, period): Financial Estimates
+- grades (symbol): Stock Grades
+- grades-summary (symbol): Stock Grades Summary
+- historical-grades (symbol): Historical Stock Grades
+- historical-ratings (symbol): Historical Ratings
+- price-target-consensus (symbol): Price Target Consensus
+- price-target-summary (symbol): Price Target Summary
+- ratings-snapshot (symbol): Ratings Snapshot
+inputSchema:
+{
+  "type": "object",
+  "properties": {
+    "endpoint": {
+      "type": "string",
+      "enum": [
+        "financial-estimates",
+        "grades",
+        "grades-summary",
+        "historical-grades",
+        "historical-ratings",
+        "price-target-consensus",
+        "price-target-summary",
+        "ratings-snapshot"
+      ],
+      "description": "The specific endpoint to call. See tool description for available endpoints."
+    },
+    "symbol": {
+      "type": "string"
+    },
+    "period": {
+      "type": "string"
+    },
+    "page": {
+      "type": "number"
+    },
+    "limit": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "endpoint"
+  ],
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}
+
+=== calendar ===
+description: Market event calendars: earnings, dividends, IPOs, and stock splits. Browse upcoming events by date range or look up a specific company's history.
+
+Endpoints:
+- dividends-calendar: Dividends Calendar
+- dividends-company (symbol): Dividends Company
+- earnings-calendar: Earnings Calendar
+- earnings-company (symbol): Earnings Report
+- ipos-calendar: IPOs Calendar
+- ipos-disclosure: IPOs Disclosure
+- ipos-prospectus: IPOs Prospectus
+- splits-calendar: Stock Splits Calendar
+- splits-company (symbol): Stock Split Details
+inputSchema:
+{
+  "type": "object",
+  "properties": {
+    "endpoint": {
+      "type": "string",
+      "enum": [
+        "dividends-calendar",
+        "dividends-company",
+        "earnings-calendar",
+        "earnings-company",
+        "ipos-calendar",
+        "ipos-disclosure",
+        "ipos-prospectus",
+        "splits-calendar",
+        "splits-company"
+      ],
+      "description": "The specific endpoint to call. See tool description for available endpoints."
+    },
+    "from": {
+      "type": "string"
+    },
+    "to": {
+      "type": "string"
+    },
+    "page": {
+      "type": "number"
+    },
+    "symbol": {
+      "type": "string"
+    },
+    "limit": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "endpoint"
+  ],
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}
+
+=== chart ===
+description: Historical and intraday stock price charts. Get EOD prices (full, light, dividend-adjusted, or unadjusted) and intraday bars at 1min, 5min, 15min, 30min, 1hr, and 4hr intervals.
+
+Endpoints:
+- historical-price-eod-dividend-adjusted (symbol): Dividend Adjusted Price Chart
+- historical-price-eod-full (symbol): Stock Price and Volume Data
+- historical-price-eod-light (symbol): Stock Chart Light
+- historical-price-eod-non-split-adjusted (symbol): Unadjusted Stock Price
+- intraday-1-hour (symbol): 1 Hour Interval Stock Chart
+- intraday-1-min (symbol): 1 Min Interval Stock Chart
+- intraday-15-min (symbol): 15 Min Interval Stock Chart
+- intraday-30-min (symbol): 30 Min Interval Stock Chart
+- intraday-4-hour (symbol): 4 Hour Interval Stock Chart
+- intraday-5-min (symbol): 5 Min Interval Stock Chart
+inputSchema:
+{
+  "type": "object",
+  "properties": {
+    "endpoint": {
+      "type": "string",
+      "enum": [
+        "historical-price-eod-dividend-adjusted",
+        "historical-price-eod-full",
+        "historical-price-eod-light",
+        "historical-price-eod-non-split-adjusted",
+        "intraday-1-hour",
+        "intraday-1-min",
+        "intraday-15-min",
+        "intraday-30-min",
+        "intraday-4-hour",
+        "intraday-5-min"
+      ],
+      "description": "The specific endpoint to call. See tool description for available endpoints."
+    },
+    "symbol": {
+      "type": "string"
+    },
+    "from": {
+      "type": "string"
+    },
+    "to": {
+      "type": "string"
+    },
+    "nonadjusted": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "endpoint"
+  ],
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}
+
+=== commitmentOfTraders ===
+description: CFTC Commitment of Traders (COT) reports. View trader positions, sentiment analysis, and the list of available COT symbols.
+
+Endpoints:
+- COT-report: COT Report
+- COT-report-analysis: COT Analysis By Dates
+- COT-report-list: COT Report List
+inputSchema:
+{
+  "type": "object",
+  "properties": {
+    "endpoint": {
+      "type": "string",
+      "enum": [
+        "COT-report",
+        "COT-report-analysis",
+        "COT-report-list"
+      ],
+      "description": "The specific endpoint to call. See tool description for available endpoints."
+    },
+    "symbol": {
+      "type": "string"
+    },
+    "to": {
+      "type": "string"
+    },
+    "from": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "endpoint"
+  ],
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}
+
+=== commodity ===
+description: Commodity market data: quotes, historical EOD prices, and intraday charts (1min, 5min, 1hr). List available commodity symbols or get real-time/batch quotes.
+
+Endpoints:
+- all-commodities-quotes: All Commodities Quotes
+- commodities-historical-price-eod-full (symbol): Full Chart
+- commodities-historical-price-eod-light (symbol): Light Chart
+- commodities-intraday-1-hour (symbol): 1-Hour Interval Commodities Chart
+- commodities-intraday-1-min (symbol): 1-Minute Interval Commodities Chart
+- commodities-intraday-5-min (symbol): 5-Minute Interval Commodities Chart
+- commodities-list: Commodities List
+- commodities-quote (symbol): Commodities Quote
+- commodities-quote-short (symbol): Commodities Quote Short
+inputSchema:
+{
+  "type": "object",
+  "properties": {
+    "endpoint": {
+      "type": "string",
+      "enum": [
+        "all-commodities-quotes",
+        "commodities-historical-price-eod-full",
+        "commodities-historical-price-eod-light",
+        "commodities-intraday-1-hour",
+        "commodities-intraday-1-min",
+        "commodities-intraday-5-min",
+        "commodities-list",
+        "commodities-quote",
+        "commodities-quote-short"
+      ],
+      "description": "The specific endpoint to call. See tool description for available endpoints."
+    },
+    "short": {
+      "type": "boolean"
+    },
+    "symbol": {
+      "type": "string"
+    },
+    "from": {
+      "type": "string"
+    },
+    "to": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "endpoint"
+  ],
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}
+
+=== company ===
+description: Company fundamentals and corporate data: profiles, executives, employee counts, market cap, shares float, M&A activity, peer comparisons, and executive compensation. Look up by symbol or CIK.
+
+Endpoints:
+- all-shares-float: All Shares Float
+- batch-market-cap (symbols): Batch Market Cap
+- company-executives (symbol): Company Executives
+- company-notes (symbol): Company Notes
+- delisted-companies: Delisted Companies
+- employee-count (symbol): Company Employee Count
+- executive-compensation (symbol): Executive Compensation
+- executive-compensation-benchmark: Executive Compensation Benchmark
+- historical-employee-count (symbol): Company Historical Employee Count
+- historical-market-cap (symbol): Historical Market Cap
+- latest-mergers-acquisitions: Latest Mergers & Acquisitions
+- market-cap (symbol): Company Market Cap
+- peers (symbol): Stock Peer Comparison
+- profile-cik (cik): Company Profile by CIK
+- profile-symbol (symbol): Company Profile Data
+- search-mergers-acquisitions (name): Search Mergers & Acquisitions
+- shares-float (symbol): Company Share Float & Liquidity
+inputSchema:
+{
+  "type": "object",
+  "properties": {
+    "endpoint": {
+      "type": "string",
+      "enum": [
+        "all-shares-float",
+        "batch-market-cap",
+        "company-executives",
+        "company-notes",
+        "delisted-companies",
+        "employee-count",
+        "executive-compensation",
+        "executive-compensation-benchmark",
+        "historical-employee-count",
+        "historical-market-cap",
+        "latest-mergers-acquisitions",
+        "market-cap",
+        "peers",
+        "profile-cik",
+        "profile-symbol",
+        "search-mergers-acquisitions",
+        "shares-float"
+      ],
+      "description": "The specific endpoint to call. See tool description for available endpoints."
+    },
+    "limit": {
+      "type": "number"
+    },
+    "page": {
+      "type": "number"
+    },
+    "symbols": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "symbol": {
+      "type": "string"
+    },
+    "year": {
+      "type": "number"
+    },
+    "from": {
+      "type": "string"
+    },
+    "to": {
+      "type": "string"
+    },
+    "cik": {
+      "type": "number"
+    },
+    "name": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "endpoint"
+  ],
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}
+
+=== crypto ===
+description: Cryptocurrency market data: quotes, historical EOD prices, and intraday charts (1min, 5min, 1hr). List available crypto symbols or get real-time/batch quotes.
+
+Endpoints:
+- all-cryptocurrency-quotes: All Cryptocurrencies Quotes
+- cryptocurrency-historical-price-eod-full (symbol): Historical Cryptocurrency Full Chart
+- cryptocurrency-historical-price-eod-light (symbol): Historical Cryptocurrency Light Chart
+- cryptocurrency-intraday-1-hour (symbol): 1-Hour Interval Cryptocurrency Data
+- cryptocurrency-intraday-1-min (symbol): 1-Minute Interval Cryptocurrency Data
+- cryptocurrency-intraday-5-min (symbol): 5-Minute Interval Cryptocurrency Data
+- cryptocurrency-list: Cryptocurrency List
+- cryptocurrency-quote (symbol): Full Cryptocurrency Quote
+- cryptocurrency-quote-short (symbol): Cryptocurrency Quote Short
+inputSchema:
+{
+  "type": "object",
+  "properties": {
+    "endpoint": {
+      "type": "string",
+      "enum": [
+        "all-cryptocurrency-quotes",
+        "cryptocurrency-historical-price-eod-full",
+        "cryptocurrency-historical-price-eod-light",
+        "cryptocurrency-intraday-1-hour",
+        "cryptocurrency-intraday-1-min",
+        "cryptocurrency-intraday-5-min",
+        "cryptocurrency-list",
+        "cryptocurrency-quote",
+        "cryptocurrency-quote-short"
+      ],
+      "description": "The specific endpoint to call. See tool description for available endpoints."
+    },
+    "short": {
+      "type": "boolean"
+    },
+    "symbol": {
+      "type": "string"
+    },
+    "from": {
+      "type": "string"
+    },
+    "to": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "endpoint"
+  ],
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}
+
+=== directory ===
+description: Reference lists and directories: actively traded symbols, ETFs, company symbols, CIK numbers, financial statement symbols, earnings transcript symbols, available countries/exchanges/industries/sectors, and symbol changes.
+
+Endpoints:
+- ETFs-list: ETF Symbol Search
+- actively-trading-list: Actively Trading List
+- available-countries: Available Countries
+- available-exchanges: Available Exchanges
+- available-industries: Available Industries
+- available-sectors: Available Sectors
+- cik-list: CIK List
+- company-symbols-list: Company Symbols List
+- earnings-transcript-list: Earnings Transcript List
+- financial-symbols-list: Financial Statement Symbols List
+- symbol-changes-list: Symbol Changes List
+inputSchema:
+{
+  "type": "object",
+  "properties": {
+    "endpoint": {
+      "type": "string",
+      "enum": [
+        "ETFs-list",
+        "actively-trading-list",
+        "available-countries",
+        "available-exchanges",
+        "available-industries",
+        "available-sectors",
+        "cik-list",
+        "company-symbols-list",
+        "earnings-transcript-list",
+        "financial-symbols-list",
+        "symbol-changes-list"
+      ],
+      "description": "The specific endpoint to call. See tool description for available endpoints."
+    },
+    "page": {
+      "type": "number"
+    },
+    "limit": {
+      "type": "number"
+    },
+    "invalid": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "endpoint"
+  ],
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}
+
+=== discountedCashFlow ===
+description: Discounted cash flow (DCF) valuations: standard and levered models, plus custom DCF with configurable assumptions (growth rate, tax rate, WACC components, etc.).
+
+Endpoints:
+- custom-dcf-advanced (symbol): Custom DCF Advanced
+- custom-dcf-levered (symbol): Custom DCF Levered
+- dcf-advanced (symbol): DCF Valuation
+- dcf-levered (symbol): Levered DCF
+inputSchema:
+{
+  "type": "object",
+  "properties": {
+    "endpoint": {
+      "type": "string",
+      "enum": [
+        "custom-dcf-advanced",
+        "custom-dcf-levered",
+        "dcf-advanced",
+        "dcf-levered"
+      ],
+      "description": "The specific endpoint to call. See tool description for available endpoints."
+    },
+    "symbol": {
+      "type": "string"
+    },
+    "revenueGrowthPct": {
+      "type": "string"
+    },
+    "ebitdaPct": {
+      "type": "string"
+    },
+    "depreciationAndAmortizationPct": {
+      "type": "string"
+    },
+    "cashAndShortTermInvestmentsPct": {
+      "type": "string"
+    },
+    "receivablesPct": {
+      "type": "string"
+    },
+    "inventoriesPct": {
+      "type": "string"
+    },
+    "payablePct": {
+      "type": "string"
+    },
+    "ebitPct": {
+      "type": "string"
+    },
+    "capitalExpenditurePct": {
+      "type": "string"
+    },
+    "operatingCashFlowPct": {
+      "type": "string"
+    },
+    "sellingGeneralAndAdministrativeExpensesPct": {
+      "type": "string"
+    },
+    "taxRate": {
+      "type": "string"
+    },
+    "longTermGrowthRate": {
+      "type": "string"
+    },
+    "costOfDebt": {
+      "type": "string"
+    },
+    "costOfEquity": {
+      "type": "string"
+    },
+    "marketRiskPremium": {
+      "type": "string"
+    },
+    "beta": {
+      "type": "string"
+    },
+    "riskFreeRate": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "endpoint"
+  ],
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}
+
+=== earningsTranscript ===
+description: Earnings call transcripts: search by symbol/quarter/year, list available transcript dates, browse the latest transcripts, or list all symbols with transcripts.
+
+Endpoints:
+- available-transcript-symbols: Available Transcript Symbols
+- latest-transcripts: Latest Earning Transcripts
+- search-transcripts (symbol, year, quarter): Earnings Transcript
+- transcripts-dates-by-symbol (symbol): Transcripts Dates By Symbol
+inputSchema:
+{
+  "type": "object",
+  "properties": {
+    "endpoint": {
+      "type": "string",
+      "enum": [
+        "available-transcript-symbols",
+        "latest-transcripts",
+        "search-transcripts",
+        "transcripts-dates-by-symbol"
+      ],
+      "description": "The specific endpoint to call. See tool description for available endpoints."
+    },
+    "limit": {
+      "type": "number"
+    },
+    "page": {
+      "type": "number"
+    },
+    "symbol": {
+      "type": "string"
+    },
+    "year": {
+      "type": "number"
+    },
+    "quarter": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "endpoint"
+  ],
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}
+
+=== economics ===
+description: Macroeconomic data: economic event calendars, named indicators (GDP, CPI, etc.) with date ranges, treasury rates, and market risk premiums by country.
+
+Endpoints:
+- economics-calendar: Economic Data Releases Calendar
+- economics-indicators (name): Economics Indicators
+- market-risk-premium: Market Risk Premium
+- treasury-rates: Treasury Rates
+inputSchema:
+{
+  "type": "object",
+  "properties": {
+    "endpoint": {
+      "type": "string",
+      "enum": [
+        "economics-calendar",
+        "economics-indicators",
+        "market-risk-premium",
+        "treasury-rates"
+      ],
+      "description": "The specific endpoint to call. See tool description for available endpoints."
+    },
+    "country": {
+      "type": "string"
+    },
+    "to": {
+      "type": "string"
+    },
+    "from": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "endpoint"
+  ],
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}
+
+=== etfAndMutualFunds ===
+description: ETF and mutual fund analysis: holdings, sector/country weightings, asset exposure, fund information, and SEC disclosure filings.
+
+Endpoints:
+- country-weighting (symbol): ETF & Fund Country Allocation
+- disclosures-dates (symbol): Fund & ETF Disclosures by Date
+- disclosures-name-search (name): Mutual Fund & ETF Disclosure Name Search
+- etf-asset-exposure (symbol): ETF Asset Exposure
+- holdings (symbol): ETF & Fund Holdings
+- information (symbol): ETF & Mutual Fund Information
+- latest-disclosures (symbol): Mutual Fund & ETF Disclosure
+- mutual-fund-disclosures (symbol, year, quarter): Mutual Fund Disclosures
+- sector-weighting (symbol): ETF Sector Weighting
+inputSchema:
+{
+  "type": "object",
+  "properties": {
+    "endpoint": {
+      "type": "string",
+      "enum": [
+        "country-weighting",
+        "disclosures-dates",
+        "disclosures-name-search",
+        "etf-asset-exposure",
+        "holdings",
+        "information",
+        "latest-disclosures",
+        "mutual-fund-disclosures",
+        "sector-weighting"
+      ],
+      "description": "The specific endpoint to call. See tool description for available endpoints."
+    },
+    "symbol": {
+      "type": "string"
+    },
+    "cik": {
+      "type": "number"
+    },
+    "name": {
+      "type": "string"
+    },
+    "year": {
+      "type": "number"
+    },
+    "quarter": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "endpoint"
+  ],
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}
+
+=== forex ===
+description: Forex market data: currency pair quotes, historical EOD prices, and intraday charts (1min, 5min, 1hr). List available forex pairs or get real-time/batch quotes.
+
+Endpoints:
+- all-forex-quotes: Batch Forex Quotes
+- forex-historical-price-eod-full (symbol): Historical Forex Full Chart
+- forex-historical-price-eod-light (symbol): Historical Forex Light Chart
+- forex-intraday-1-hour (symbol): 1-Hour Interval Forex Chart
+- forex-intraday-1-min (symbol): 1-Minute Interval Forex Chart
+- forex-intraday-5-min (symbol): 5-Minute Interval Forex Chart
+- forex-list: Forex Currency Pairs
+- forex-quote (symbol): Forex Quote
+- forex-quote-short (symbol): Forex Short Quote
+inputSchema:
+{
+  "type": "object",
+  "properties": {
+    "endpoint": {
+      "type": "string",
+      "enum": [
+        "all-forex-quotes",
+        "forex-historical-price-eod-full",
+        "forex-historical-price-eod-light",
+        "forex-intraday-1-hour",
+        "forex-intraday-1-min",
+        "forex-intraday-5-min",
+        "forex-list",
+        "forex-quote",
+        "forex-quote-short"
+      ],
+      "description": "The specific endpoint to call. See tool description for available endpoints."
+    },
+    "short": {
+      "type": "boolean"
+    },
+    "symbol": {
+      "type": "string"
+    },
+    "from": {
+      "type": "string"
+    },
+    "to": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "endpoint"
+  ],
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}
+
+=== form13F ===
+description: SEC Form 13F institutional ownership data: extract holdings by CIK, view filing dates, analyze holder performance, industry breakdowns, and positions by symbol/quarter.
+
+Endpoints:
+- filings-extract (cik, year, quarter): Filings Extract
+- filings-extract-with-analytics-by-holder (symbol, year, quarter): Filings Extract With Analytics By Holder
+- form-13f-filings-dates (cik): Form 13F Filings Dates
+- holder-performance-summary (cik): Holder Performance Summary
+- holders-industry-breakdown (cik, year, quarter): Holders Industry Breakdown
+- industry-summary (year, quarter): Industry Performance Summary
+- latest-filings: Institutional Ownership Filings
+- positions-summary (symbol, year, quarter): Positions Summary
+inputSchema:
+{
+  "type": "object",
+  "properties": {
+    "endpoint": {
+      "type": "string",
+      "enum": [
+        "filings-extract",
+        "filings-extract-with-analytics-by-holder",
+        "form-13f-filings-dates",
+        "holder-performance-summary",
+        "holders-industry-breakdown",
+        "industry-summary",
+        "latest-filings",
+        "positions-summary"
+      ],
+      "description": "The specific endpoint to call. See tool description for available endpoints."
+    },
+    "cik": {
+      "type": "number"
+    },
+    "year": {
+      "type": "number"
+    },
+    "quarter": {
+      "type": "number"
+    },
+    "symbol": {
+      "type": "string"
+    },
+    "page": {
+      "type": "number"
+    },
+    "limit": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "endpoint"
+  ],
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}
+
+=== indexes ===
+description: Stock market indexes: current and historical constituents of S&P 500, Nasdaq, and Dow Jones. Quotes, EOD history, and intraday charts for any index symbol.
+
+Endpoints:
+- all-index-quotes: All Index Quotes
+- dow-jones: Dow Jones
+- historical-dow-jones: Historical Dow Jones
+- historical-nasdaq: Historical Nasdaq
+- historical-sp-500: Historical S&P 500
+- index-historical-price-eod-full (symbol): Historical Index Full Chart
+- index-historical-price-eod-light (symbol): Historical Index Light Chart
+- index-intraday-1-hour (symbol): 1-Hour Interval Index Price
+- index-intraday-1-min (symbol): 1-Minute Interval Index Price
+- index-intraday-5-min (symbol): 5-Minute Interval Index Price
+- index-quote (symbol): Index Quote
+- index-quote-short (symbol): Index Short Quote
+- indexes-list: Stock Market Indexes List
+- nasdaq: Nasdaq Index
+- sp-500: S&P 500 Index
+inputSchema:
+{
+  "type": "object",
+  "properties": {
+    "endpoint": {
+      "type": "string",
+      "enum": [
+        "all-index-quotes",
+        "dow-jones",
+        "historical-dow-jones",
+        "historical-nasdaq",
+        "historical-sp-500",
+        "index-historical-price-eod-full",
+        "index-historical-price-eod-light",
+        "index-intraday-1-hour",
+        "index-intraday-1-min",
+        "index-intraday-5-min",
+        "index-quote",
+        "index-quote-short",
+        "indexes-list",
+        "nasdaq",
+        "sp-500"
+      ],
+      "description": "The specific endpoint to call. See tool description for available endpoints."
+    },
+    "short": {
+      "type": "boolean"
+    },
+    "symbol": {
+      "type": "string"
+    },
+    "from": {
+      "type": "string"
+    },
+    "to": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "endpoint"
+  ],
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}
+
+=== insiderTrades ===
+description: Insider trading data: latest insider transactions, search by symbol/CIK/transaction type, insider trade statistics, acquisition ownership changes, and transaction type reference.
+
+Endpoints:
+- acquisition-ownership (symbol): Acquisition Ownership
+- all-transaction-types: All Insider Transaction Types
+- insider-trade-statistics (symbol): Insider Trade Statistics
+- latest-insider-trade: Latest Insider Trading
+- search-insider-trades: Search Insider Trades
+- search-reporting-name (name): Search Insider Trades by Reporting Name
+inputSchema:
+{
+  "type": "object",
+  "properties": {
+    "endpoint": {
+      "type": "string",
+      "enum": [
+        "acquisition-ownership",
+        "all-transaction-types",
+        "insider-trade-statistics",
+        "latest-insider-trade",
+        "search-insider-trades",
+        "search-reporting-name"
+      ],
+      "description": "The specific endpoint to call. See tool description for available endpoints."
+    },
+    "symbol": {
+      "type": "string"
+    },
+    "limit": {
+      "type": "number"
+    },
+    "date": {
+      "type": "string"
+    },
+    "page": {
+      "type": "number"
+    },
+    "reportingCik": {
+      "type": "string"
+    },
+    "companyCik": {
+      "type": "string"
+    },
+    "transactionType": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "endpoint"
+  ],
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}
+
+=== marketHours ===
+description: Exchange trading hours and holiday schedules. Check current market status for any exchange or list all exchanges at once.
+
+Endpoints:
+- all-exchange-market-hours: All Exchange Market Hours
+- exchange-market-hours (exchange): Global Exchange Market Hours
+- holidays-by-exchange (exchange): Holidays By Exchange
+inputSchema:
+{
+  "type": "object",
+  "properties": {
+    "endpoint": {
+      "type": "string",
+      "enum": [
+        "all-exchange-market-hours",
+        "exchange-market-hours",
+        "holidays-by-exchange"
+      ],
+      "description": "The specific endpoint to call. See tool description for available endpoints."
+    },
+    "timestamp": {
+      "type": "string"
+    },
+    "exchange": {
+      "type": "string"
+    },
+    "from": {
+      "type": "string"
+    },
+    "to": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "endpoint"
+  ],
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}
+
+=== marketPerformance ===
+description: Market performance and valuation snapshots: biggest gainers/losers, most active stocks, sector and industry P/E ratios, and historical sector/industry performance.
+
+Endpoints:
+- biggest-gainers: Biggest Stock Gainers
+- biggest-losers: Biggest Stock Losers
+- historical-industry-pe (industry): Historical Industry PE
+- historical-industry-performance (industry): Historical Industry Performance
+- historical-sector-pe (sector): Historical Sector PE
+- historical-sector-performance (sector): Historical Market Sector Performance
+- industry-PE-snapshot (date): Industry PE Snapshot
+- industry-performance-snapshot (date): Industry Performance Snapshot
+- most-active: Top Traded Stocks
+- sector-PE-snapshot (date): Sector PE Snapshot
+- sector-performance-snapshot (date): Market Sector Performance Snapshot
+inputSchema:
+{
+  "type": "object",
+  "properties": {
+    "endpoint": {
+      "type": "string",
+      "enum": [
+        "biggest-gainers",
+        "biggest-losers",
+        "historical-industry-pe",
+        "historical-industry-performance",
+        "historical-sector-pe",
+        "historical-sector-performance",
+        "industry-PE-snapshot",
+        "industry-performance-snapshot",
+        "most-active",
+        "sector-PE-snapshot",
+        "sector-performance-snapshot"
+      ],
+      "description": "The specific endpoint to call. See tool description for available endpoints."
+    },
+    "industry": {
+      "type": "string"
+    },
+    "exchange": {
+      "type": "string"
+    },
+    "from": {
+      "type": "string"
+    },
+    "to": {
+      "type": "string"
+    },
+    "sector": {
+      "type": "string"
+    },
+    "date": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "endpoint"
+  ],
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}
+
+=== news ===
+description: Financial news: general market news, stock-specific news (search by symbols), crypto news, forex news, press releases, and FMP articles. Filter by date range with pagination.
+
+Endpoints:
+- crypto-news: Crypto News
+- fmp-articles: FMP Articles
+- forex-news: Forex News
+- general-news: General News
+- press-releases: Press Releases
+- search-crypto-news (symbols): Search Crypto News
+- search-forex-news (symbols): Search Forex News
+- search-press-releases (symbols): Search Press Releases
+- search-stock-news (symbols): Search Stock News
+- stock-news: Stock News
+inputSchema:
+{
+  "type": "object",
+  "properties": {
+    "endpoint": {
+      "type": "string",
+      "enum": [
+        "crypto-news",
+        "fmp-articles",
+        "forex-news",
+        "general-news",
+        "press-releases",
+        "search-crypto-news",
+        "search-forex-news",
+        "search-press-releases",
+        "search-stock-news",
+        "stock-news"
+      ],
+      "description": "The specific endpoint to call. See tool description for available endpoints."
+    },
+    "from": {
+      "type": "string"
+    },
+    "to": {
+      "type": "string"
+    },
+    "page": {
+      "type": "number"
+    },
+    "limit": {
+      "type": "number"
+    },
+    "symbols": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "endpoint"
+  ],
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}
+
+=== quote ===
+description: Real-time stock quotes: single or batch quotes (full and short), aftermarket quotes/trades, and full-market quotes for all stocks on an exchange, ETFs, mutual funds, crypto, commodities, forex, and indexes.
+
+Endpoints:
+- aftermarket-quote (symbol): Aftermarket Quote
+- aftermarket-trade (symbol): Aftermarket Trade
+- batch-aftermarket-quote (symbols): Batch Aftermarket Quote
+- batch-aftermarket-trade (symbols): Batch Aftermarket Trade
+- batch-quote (symbols): Stock Batch Quote
+- batch-quote-short (symbols): Stock Batch Quote Short
+- full-commodities-quotes: Full Commodities Quotes
+- full-cryptocurrency-quotes: Full Cryptocurrency Quotes
+- full-etf-quotes: ETF Price Quotes
+- full-exchange-quotes (exchange): Exchange Stock Quotes
+- full-forex-quotes: Full Forex Quote
+- full-index-quotes: Full Index Quotes
+- full-mutualfund-quotes: Mutual Fund Price Quotes
+- quote (symbol): Stock Quote
+- quote-change (symbol): Stock Price Change
+- quote-short (symbol): Stock Quote Short
+inputSchema:
+{
+  "type": "object",
+  "properties": {
+    "endpoint": {
+      "type": "string",
+      "enum": [
+        "aftermarket-quote",
+        "aftermarket-trade",
+        "batch-aftermarket-quote",
+        "batch-aftermarket-trade",
+        "batch-quote",
+        "batch-quote-short",
+        "full-commodities-quotes",
+        "full-cryptocurrency-quotes",
+        "full-etf-quotes",
+        "full-exchange-quotes",
+        "full-forex-quotes",
+        "full-index-quotes",
+        "full-mutualfund-quotes",
+        "quote",
+        "quote-change",
+        "quote-short"
+      ],
+      "description": "The specific endpoint to call. See tool description for available endpoints."
+    },
+    "symbol": {
+      "type": "string"
+    },
+    "symbols": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "short": {
+      "type": "boolean"
+    },
+    "exchange": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "endpoint"
+  ],
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}
+
+=== search ===
+description: Search and screen stocks: search by symbol, company name, CIK, ISIN, or CUSIP. Use the stock screener to filter by market cap, price, beta, dividend, volume, sector, industry, country, and more.
+
+Endpoints:
+- search-CIK (cik): CIK
+- search-ISIN (isin): ISIN
+- search-company-screener: Stock Screener
+- search-cusip (cusip): CUSIP
+- search-exchange-variants (symbol): Exchange Variants
+- search-name (query): Company Name Search
+- search-symbol (query): Stock Symbol Search
+inputSchema:
+{
+  "type": "object",
+  "properties": {
+    "endpoint": {
+      "type": "string",
+      "enum": [
+        "search-CIK",
+        "search-ISIN",
+        "search-company-screener",
+        "search-cusip",
+        "search-exchange-variants",
+        "search-name",
+        "search-symbol"
+      ],
+      "description": "The specific endpoint to call. See tool description for available endpoints."
+    },
+    "cik": {
+      "type": "number"
+    },
+    "limit": {
+      "type": "number"
+    },
+    "isin": {
+      "type": "string"
+    },
+    "marketCapMoreThan": {
+      "type": "number"
+    },
+    "marketCapLowerThan": {
+      "type": "number"
+    },
+    "sector": {
+      "type": "string"
+    },
+    "industry": {
+      "type": "string"
+    },
+    "betaMoreThan": {
+      "type": "number"
+    },
+    "betaLowerThan": {
+      "type": "number"
+    },
+    "priceMoreThan": {
+      "type": "number"
+    },
+    "priceLowerThan": {
+      "type": "number"
+    },
+    "dividendMoreThan": {
+      "type": "number"
+    },
+    "dividendLowerThan": {
+      "type": "number"
+    },
+    "volumeMoreThan": {
+      "type": "number"
+    },
+    "volumeLowerThan": {
+      "type": "number"
+    },
+    "exchange": {
+      "type": "string"
+    },
+    "country": {
+      "type": "string"
+    },
+    "isEtf": {
+      "type": "boolean"
+    },
+    "isFund": {
+      "type": "boolean"
+    },
+    "isActivelyTrading": {
+      "type": "boolean"
+    },
+    "includeAllShareClasses": {
+      "type": "boolean"
+    },
+    "cusip": {
+      "type": "string"
+    },
+    "symbol": {
+      "type": "string"
+    },
+    "query": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "endpoint"
+  ],
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}
+
+=== secFilings ===
+description: SEC filings: latest 8-K and financial filings, search filings by symbol/CIK/form type/company name, full SEC company profiles, and SIC industry classification data.
+
+Endpoints:
+- 8k-latest: Latest 8-K SEC Filings
+- all-industry-classification: All Industry Classification
+- company-search-by-cik (cik): SEC Filings Company Search By CIK
+- company-search-by-symbol (symbol): SEC Filings Company Search By Symbol
+- financials-latest: Latest SEC Filings
+- industry-classification-list: Industry Classification List
+- industry-classification-search: Industry Classification Search
+- search-by-cik (cik): SEC Filings By CIK
+- search-by-form-type (formType): SEC Filings By Form Type
+- search-by-name (company): SEC Filings By Name
+- search-by-symbol (symbol): SEC Filings By Symbol
+- sec-company-full-profile (symbol): SEC Company Full Profile
+inputSchema:
+{
+  "type": "object",
+  "properties": {
+    "endpoint": {
+      "type": "string",
+      "enum": [
+        "8k-latest",
+        "all-industry-classification",
+        "company-search-by-cik",
+        "company-search-by-symbol",
+        "financials-latest",
+        "industry-classification-list",
+        "industry-classification-search",
+        "search-by-cik",
+        "search-by-form-type",
+        "search-by-name",
+        "search-by-symbol",
+        "sec-company-full-profile"
+      ],
+      "description": "The specific endpoint to call. See tool description for available endpoints."
+    },
+    "from": {
+      "type": "string"
+    },
+    "to": {
+      "type": "string"
+    },
+    "page": {
+      "type": "number"
+    },
+    "limit": {
+      "type": "number"
+    },
+    "cik": {
+      "type": "number"
+    },
+    "symbol": {
+      "type": "string"
+    },
+    "industryTitle": {
+      "type": "string"
+    },
+    "sicCode": {
+      "type": "number"
+    },
+    "formType": {
+      "type": "string"
+    },
+    "company": {
+      "type": "string"
+    },
+    "cik-A": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "endpoint"
+  ],
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}
+
+=== senate ===
+description: U.S. congressional trading disclosures: latest Senate and House financial disclosures, search trades by stock symbol or politician name.
+
+Endpoints:
+- house-latest: Latest House Financial Disclosures
+- house-trading (symbol): U.S. House Trades
+- house-trading-by-name (name): House Trades By Name
+- senate-latest: Latest Senate Financial Disclosures
+- senate-trading (symbol): Senate Trading Activity
+- senate-trading-by-name (name): Senate Trades By Name
+inputSchema:
+{
+  "type": "object",
+  "properties": {
+    "endpoint": {
+      "type": "string",
+      "enum": [
+        "house-latest",
+        "house-trading",
+        "house-trading-by-name",
+        "senate-latest",
+        "senate-trading",
+        "senate-trading-by-name"
+      ],
+      "description": "The specific endpoint to call. See tool description for available endpoints."
+    },
+    "page": {
+      "type": "number"
+    },
+    "limit": {
+      "type": "number"
+    },
+    "symbol": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "endpoint"
+  ],
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}
+
+=== statements ===
+description: Financial statements and ratios: income statements, balance sheets, cash flow statements (standard, as-reported, TTM, growth). Key metrics, financial ratios, scores, enterprise values, owner earnings, and revenue segmentation (geographic and product). Supports annual/quarterly periods.
+
+Endpoints:
+- as-reported-balance-statements (symbol): As Reported Balance Statements
+- as-reported-cashflow-statements (symbol): As Reported Cashflow Statements
+- as-reported-financial-statements (symbol): As Reported Financial Statements
+- as-reported-income-statements (symbol): As Reported Income Statements
+- balance-sheet-statement (symbol): Balance Sheet Statement
+- balance-sheet-statement-growth (symbol): Balance Sheet Statement Growth
+- balance-sheet-statements-ttm (symbol): Balance Sheet Statements TTM
+- cashflow-statement (symbol): Cash Flow Statement
+- cashflow-statement-growth (symbol): Cashflow Statement Growth
+- cashflow-statements-ttm (symbol): Cashflow Statements TTM
+- enterprise-values (symbol): Enterprise Values
+- financial-reports-dates (symbol): Financial Reports Dates
+- financial-reports-form-10-k-json (symbol, year, period): Financial Reports Form 10-K JSON
+- financial-reports-form-10-k-xlsx (symbol, year, period): Financial Reports Form 10-K XLSX
+- financial-scores (symbol): Financial Scores
+- financial-statement-growth (symbol): Financial Statement Growth
+- income-statement (symbol): Income Statement
+- income-statement-growth (symbol): Income Statement Growth
+- income-statements-ttm (symbol): Income Statements TTM
+- key-metrics (symbol): Key Metrics
+- key-metrics-ttm (symbol): Key Metrics TTM
+- latest-financial-statements: Latest Financial Statements
+- metrics-ratios (symbol): Financial Ratios
+- metrics-ratios-ttm (symbol): Financial Ratios TTM
+- owner-earnings (symbol): Owner Earnings
+- revenue-geographic-segments (symbol): Revenue Geographic Segments
+- revenue-product-segmentation (symbol): Revenue Product Segmentation
+inputSchema:
+{
+  "type": "object",
+  "properties": {
+    "endpoint": {
+      "type": "string",
+      "enum": [
+        "as-reported-balance-statements",
+        "as-reported-cashflow-statements",
+        "as-reported-financial-statements",
+        "as-reported-income-statements",
+        "balance-sheet-statement",
+        "balance-sheet-statement-growth",
+        "balance-sheet-statements-ttm",
+        "cashflow-statement",
+        "cashflow-statement-growth",
+        "cashflow-statements-ttm",
+        "enterprise-values",
+        "financial-reports-dates",
+        "financial-reports-form-10-k-json",
+        "financial-reports-form-10-k-xlsx",
+        "financial-scores",
+        "financial-statement-growth",
+        "income-statement",
+        "income-statement-growth",
+        "income-statements-ttm",
+        "key-metrics",
+        "key-metrics-ttm",
+        "latest-financial-statements",
+        "metrics-ratios",
+        "metrics-ratios-ttm",
+        "owner-earnings",
+        "revenue-geographic-segments",
+        "revenue-product-segmentation"
+      ],
+      "description": "The specific endpoint to call. See tool description for available endpoints."
+    },
+    "symbol": {
+      "type": "string"
+    },
+    "limit": {
+      "type": "number"
+    },
+    "period": {
+      "type": "string"
+    },
+    "year": {
+      "type": "number"
+    },
+    "page": {
+      "type": "number"
+    },
+    "structure": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "endpoint"
+  ],
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}
+
+=== technicalIndicators ===
+description: Technical analysis indicators: SMA, EMA, DEMA, TEMA, WMA, RSI, ADX, Williams %R, and standard deviation. Specify symbol, timeframe (1min, 5min, 15min, 30min, 1hour, 4hour, daily), and period length.
+
+Endpoints:
+- average-directional-index (symbol, periodLength, timeframe): Average Directional Index
+- double-exponential-moving-average (symbol, periodLength, timeframe): Double Exponential Moving Average
+- exponential-moving-average (symbol, periodLength, timeframe): Exponential Moving Average
+- relative-strength-index (symbol, periodLength, timeframe): Relative Strength Index
+- simple-moving-average (symbol, periodLength, timeframe): Simple Moving Average
+- standard-deviation (symbol, periodLength, timeframe): Standard Deviation
+- triple-exponential-moving-average (symbol, periodLength, timeframe): Triple Exponential Moving Average
+- weighted-moving-average (symbol, periodLength, timeframe): Weighted Moving Average
+- williams (symbol, periodLength, timeframe): Williams
+inputSchema:
+{
+  "type": "object",
+  "properties": {
+    "endpoint": {
+      "type": "string",
+      "enum": [
+        "average-directional-index",
+        "double-exponential-moving-average",
+        "exponential-moving-average",
+        "relative-strength-index",
+        "simple-moving-average",
+        "standard-deviation",
+        "triple-exponential-moving-average",
+        "weighted-moving-average",
+        "williams"
+      ],
+      "description": "The specific endpoint to call. See tool description for available endpoints."
+    },
+    "symbol": {
+      "type": "string"
+    },
+    "periodLength": {
+      "type": "number"
+    },
+    "timeframe": {
+      "type": "string"
+    },
+    "from": {
+      "type": "string"
+    },
+    "to": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "endpoint"
+  ],
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}
+
+Total: 27 tools

@@ -42,6 +42,53 @@ source_logger = SourceLogger()
 # ── MCP helpers ───────────────────────────────────────────────────────────────
 
 
+# FMP consolidated their MCP API: the old hyphenated tool names are now
+# `endpoint` values inside 27 parent tools. This table maps each legacy tool
+# name to its parent so call sites in this module can keep using the legacy
+# names unchanged.
+_MCP_TOOL_PARENT = {
+    # quote
+    "quote": "quote",
+    "quote-change": "quote",
+    # statements (financial filings + ratios + scores + segmentation)
+    "income-statement": "statements",
+    "balance-sheet-statement": "statements",
+    "cashflow-statement": "statements",
+    "metrics-ratios": "statements",
+    "key-metrics": "statements",
+    "enterprise-values": "statements",
+    "financial-statement-growth": "statements",
+    "financial-scores": "statements",
+    "income-statements-ttm": "statements",
+    "key-metrics-ttm": "statements",
+    "revenue-product-segmentation": "statements",
+    # company
+    "profile-symbol": "company",
+    # analyst
+    "financial-estimates": "analyst",
+    "price-target-summary": "analyst",
+    "price-target-consensus": "analyst",
+    "grades-summary": "analyst",
+    # discountedCashFlow
+    "dcf-advanced": "discountedCashFlow",
+    "dcf-levered": "discountedCashFlow",
+    # marketPerformance
+    "sector-PE-snapshot": "marketPerformance",
+    "industry-PE-snapshot": "marketPerformance",
+    # news
+    "search-stock-news": "news",
+    "search-press-releases": "news",
+    # insiderTrades
+    "insider-trade-statistics": "insiderTrades",
+    # chart
+    "historical-price-eod-full": "chart",
+    # technicalIndicators
+    "relative-strength-index": "technicalIndicators",
+    "simple-moving-average": "technicalIndicators",
+    "exponential-moving-average": "technicalIndicators",
+}
+
+
 async def _mcp_call(client: Client, tool_name: str, args: dict) -> dict | list:
     """Call MCP tool, extract data from CallToolResult."""
     result = await client.call_tool(tool_name, args)
@@ -56,10 +103,20 @@ async def _mcp_call(client: Client, tool_name: str, args: dict) -> dict | list:
 
 
 async def _safe_mcp(client: Client, tool: str, args: dict, default=None, logger: "SourceLogger | None" = None) -> dict | list:
-    """MCP call with graceful failure + source logging."""
+    """MCP call with graceful failure + source logging.
+
+    Accepts legacy hyphenated tool names (e.g. "income-statement") and routes
+    them to the new consolidated parent tool with the endpoint param injected.
+    """
     _logger = logger or source_logger
+    if tool in _MCP_TOOL_PARENT:
+        parent = _MCP_TOOL_PARENT[tool]
+        call_args = {"endpoint": tool, **args}
+    else:
+        parent = tool
+        call_args = args
     try:
-        data = await _mcp_call(client, tool, args)
+        data = await _mcp_call(client, parent, call_args)
         _logger.log("FMP-MCP", tool, f"mcp://{tool}?{args}")
         return data
     except Exception as e:

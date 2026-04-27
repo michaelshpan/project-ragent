@@ -17,11 +17,11 @@ Build a CLI-based mini-investment committee that generates a Buy/Sell decision f
 Stage 1: Parallel Research (asyncio.gather)
 ┌─────────────────┬─────────────────┬─────────────────┐
 │ Quant Valuation  │ Sentiment Search│ Technical Signals│
-│ (Grok 4.1 Think) │ (GLM-5)        │ (Qwen-3.5)      │
+│ (GLM-5)          │ (Grok 4.20)    │ (Kimi K2.6)     │
 └────────┬─────────┴────────┬────────┴────────┬─────────┘
          └─────────────────┼──────────────────┘
                            ▼
-Stage 2: Portfolio Manager Decision (Opus 4.6)
+Stage 2: Portfolio Manager Decision (Opus 4.7)
          Reads all 3 research reports → issues Buy/Sell + rationale
                            │
                            ▼
@@ -30,7 +30,7 @@ Stage 3: Devil's Advocate (Sonnet 4.6)
          → generates contrarian recommendation (opposite of Stage 2)
                            │
                            ▼
-Stage 4: Final Decision (Opus 4.6)
+Stage 4: Final Decision (Opus 4.7)
          Compares Stage 2 decision vs DA recommendation
          → issues final Buy/Sell decision
 ```
@@ -46,11 +46,11 @@ All models use the OpenAI-compatible chat completions interface except Anthropic
 
 | Role | Model | Provider | model_id | base_url | API Key Env |
 |------|-------|----------|----------|----------|-------------|
-| Portfolio Manager (Stages 2 & 4) | Claude Opus 4.6 | Anthropic | `claude-opus-4-6` | — (native SDK) | `ANTHROPIC_API_KEY` |
+| Portfolio Manager (Stages 2 & 4) | Claude Opus 4.7 | Anthropic | `claude-opus-4-7` | — (native SDK) | `ANTHROPIC_API_KEY` |
 | Devil's Advocate (Stage 3) | Claude Sonnet 4.6 | Anthropic | `claude-sonnet-4-6` | — (native SDK) | `ANTHROPIC_API_KEY` |
-| Quant Valuation Researcher | Grok 4.1 Thinking | xAI (OpenAI-compat) | `grok-4-1-fast-reasoning` | `https://api.x.ai/v1` | `XAI_API_KEY` |
-| Sentiment Researcher | GLM-5 | Zhipu (OpenAI-compat) | `glm-5` | `https://api.z.ai/api/paas/v4/` | `ZAI_API_KEY` |
-| Technical Signals Researcher | Qwen-3.5 | Together AI (OpenAI-compat) | `Qwen/Qwen3-235B-A22B-Thinking-2507` | `https://api.together.xyz/v1` | `TOGETHER_API_KEY` |
+| Quant Valuation Researcher | GLM-5 | Zhipu (OpenAI-compat) | `glm-5` | `https://api.z.ai/api/paas/v4/` | `ZAI_API_KEY` |
+| Sentiment Researcher | Grok 4.20 Reasoning | xAI (OpenAI-compat) | `grok-4.20-0309-reasoning` | `https://api.x.ai/v1` | `XAI_API_KEY` |
+| Technical Signals Researcher | Kimi K2.6 | Moonshot (OpenAI-compat) | `kimi-k2.6` | `https://api.moonshot.cn/v1` | `MOONSHOT_API_KEY` |
 
 ### LLM Call Patterns
 
@@ -80,7 +80,7 @@ response = client.chat.completions.create(
 text = response.choices[0].message.content
 ```
 
-**Important:** Some thinking/reasoning models (Grok 4.1 Thinking, Qwen-3.5) may return reasoning tokens mixed into the response. Strip any `<think>...</think>` or similar tags from the final output before passing to downstream agents. Check the response for these patterns and extract only the final answer content.
+**Important:** Some thinking/reasoning models (Grok 4.20 Reasoning, Kimi K2.6) may return reasoning tokens mixed into the response. Strip any `<think>...</think>` or similar tags from the final output before passing to downstream agents. Check the response for these patterns and extract only the final answer content.
 
 ---
 
@@ -282,20 +282,20 @@ async def run_pipeline(ticker: str):
 
     # Phase 1: Run 3 research agents in parallel
     quant_report, sentiment_report, technical_report = await asyncio.gather(
-        call_agent("grok-4.1-thinking", quant_system_prompt, quant_data),
-        call_agent("glm-5", sentiment_system_prompt, sentiment_data),
-        call_agent("qwen-3.5", technical_system_prompt, technical_data)
+        call_agent("glm-5", quant_system_prompt, quant_data),
+        call_agent("grok-4.20-reasoning", sentiment_system_prompt, sentiment_data),
+        call_agent("kimi-k2.6", technical_system_prompt, technical_data)
     )
 
     # Phase 2: Portfolio Manager decision (sequential)
-    pm_decision = await call_agent("opus-4.6", pm_stage2_prompt, combined_reports)
+    pm_decision = await call_agent("opus-4.7", pm_stage2_prompt, combined_reports)
 
     # Phase 3: Devil's Advocate (sequential, needs Stage 2 output)
     # DA also gets fresh data to conduct independent research
     da_report = await call_agent("sonnet-4.6", da_prompt, pm_decision + da_data)
 
     # Phase 4: Final decision (sequential, needs Stages 2+3)
-    final_decision = await call_agent("opus-4.6", pm_stage4_prompt, pm_decision + da_report)
+    final_decision = await call_agent("opus-4.7", pm_stage4_prompt, pm_decision + da_report)
 
     # Compile and save report
     save_report(ticker, all_outputs, source_log)
@@ -384,7 +384,7 @@ Track every external API call and search result used. Each entry should have: so
 ANTHROPIC_API_KEY=sk-ant-...
 XAI_API_KEY=xai-...
 ZAI_API_KEY=...
-TOGETHER_API_KEY=...
+MOONSHOT_API_KEY=sk-...
 FMP_API_KEY=...
 FRED_API_KEY=...
 SCRAPINGDOG_API_KEY=...
@@ -407,7 +407,7 @@ python-dotenv>=1.0.0
 
 1. **Error handling:** If a research agent fails (timeout, API error), log the error and continue the pipeline with available reports. The Portfolio Manager should note which research was missing. Set a 120-second timeout per agent call.
 
-2. **Thinking model output cleaning:** Grok 4.1 Thinking and Qwen-3.5 may return `<think>...</think>` blocks. Strip these before passing output downstream. Regex: `re.sub(r'<think>.*?</think>', '', text, flags=re.DOTALL).strip()`
+2. **Thinking model output cleaning:** Grok 4.20 Reasoning and Kimi K2.6 may return `<think>...</think>` blocks. Strip these before passing output downstream. Regex: `re.sub(r'<think>.*?</think>', '', text, flags=re.DOTALL).strip()`
 
 3. **Rate limiting:** Add a 1-second delay between sequential API calls to the same provider to avoid rate limits.
 

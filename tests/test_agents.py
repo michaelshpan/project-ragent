@@ -24,14 +24,14 @@ async def test_call_anthropic_agent():
     with patch("agents.anthropic.Anthropic", return_value=mock_client):
         with patch.dict("os.environ", {"ANTHROPIC_API_KEY": "test-key"}):
             result = await call_anthropic_agent(
-                model_id="claude-opus-4-6",
+                model_id="claude-opus-4-7",
                 system_prompt="You are a test assistant",
                 user_prompt="Test message"
             )
     
     assert result == "This is a test response"
     mock_client.messages.create.assert_called_once_with(
-        model="claude-opus-4-6",
+        model="claude-opus-4-7",
         max_tokens=2000,
         system="You are a test assistant",
         messages=[{"role": "user", "content": "Test message"}]
@@ -49,7 +49,7 @@ async def test_call_openai_compat_agent():
     with patch("agents.openai.OpenAI", return_value=mock_client):
         with patch.dict("os.environ", {"XAI_API_KEY": "test-key"}):
             result = await call_openai_compat_agent(
-                model_id="grok-4-1-fast-reasoning",
+                model_id="grok-4.20-0309-reasoning",
                 base_url="https://api.x.ai/v1",
                 system_prompt="You are a test assistant",
                 user_prompt="Test message",
@@ -99,7 +99,7 @@ async def test_call_agent_with_anthropic():
         mock_anthropic.return_value = "Anthropic response"
         
         result = await call_agent(
-            model_key="claude-opus-4-6",
+            model_key="claude-opus-4-7",
             system_prompt="Test system",
             user_prompt="Test user"
         )
@@ -115,7 +115,7 @@ async def test_call_agent_with_openai_compat():
         mock_openai.return_value = "<think>Internal thinking</think>Actual response"
         
         result = await call_agent(
-            model_key="grok-4-1-thinking",
+            model_key="grok-4.20-reasoning",
             system_prompt="Test system",
             user_prompt="Test user"
         )
@@ -139,7 +139,7 @@ async def test_call_agent_timeout():
         
         with pytest.raises(asyncio.TimeoutError):
             await call_agent(
-                model_key="claude-opus-4-6",
+                model_key="claude-opus-4-7",
                 system_prompt="Test",
                 user_prompt="Test",
                 timeout=0.1  # Very short timeout

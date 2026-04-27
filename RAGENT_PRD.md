@@ -24,17 +24,17 @@
 Stage 1: Parallel Research (asyncio.gather)
 ┌─────────────────┬─────────────────┬─────────────────┐
 │ Quant Valuation  │ Sentiment Search│ Technical Signals│
-│ (Grok 4.1)       │ (GLM-5)        │ (Kimi K2.5)     │
+│ (GLM-5)          │ (Grok 4.20)    │ (Kimi K2.6)     │
 └────────┬─────────┴────────┬────────┴────────┬────────┘
          └─────────────────┼──────────────────┘
                            ▼
-Stage 2: Portfolio Manager Decision (Claude Opus 4.6)
+Stage 2: Portfolio Manager Decision (Claude Opus 4.7)
                            │
                            ▼
 Stage 3: Devil's Advocate (Claude Sonnet 4.6)
                            │
                            ▼
-Stage 4: Final Decision (Claude Opus 4.6)
+Stage 4: Final Decision (Claude Opus 4.7)
 ```
 
 **Key Components**:
@@ -87,7 +87,7 @@ Stage 4: Final Decision (Claude Opus 4.6)
 - Single async worker (MCP client is not multi-process safe)
 
 **Core Libraries — Backend**:
-- **LLM SDKs**: anthropic (Claude), openai (Grok, GLM-5, Kimi K2.5 via OpenAI-compat)
+- **LLM SDKs**: anthropic (Claude), openai (Grok, GLM-5, Kimi K2.6 via OpenAI-compat)
 - **MCP Client**: fastmcp (FMP data via Model Context Protocol)
 - **Async HTTP**: aiohttp (FRED, Scraping Dog REST calls)
 - **Web Framework**: FastAPI, uvicorn (SSE streaming)
@@ -116,15 +116,15 @@ Stage 4: Final Decision (Claude Opus 4.6)
 
 | Role | Model | Provider | Interface | Max Tokens |
 |------|-------|----------|-----------|------------|
-| Portfolio Manager (Stages 2 & 4) | Claude Opus 4.6 | Anthropic | Native SDK | 2,000 |
+| Portfolio Manager (Stages 2 & 4) | Claude Opus 4.7 | Anthropic | Native SDK | 2,000 |
 | Devil's Advocate (Stage 3) | Claude Sonnet 4.6 | Anthropic | Native SDK | 2,000 |
-| Quant Valuation Researcher | Grok 4.1 Thinking | xAI | OpenAI-compat | 8,192 |
-| Sentiment Researcher | GLM-5 | Zhipu | OpenAI-compat | 2,000 |
-| Technical Signals Researcher | Kimi K2.5 | Moonshot | OpenAI-compat | 8,192 |
+| Quant Valuation Researcher | GLM-5 | Zhipu | OpenAI-compat | 2,000 |
+| Sentiment Researcher | Grok 4.20 Reasoning | xAI | OpenAI-compat | 8,192 |
+| Technical Signals Researcher | Kimi K2.6 | Moonshot | OpenAI-compat | 8,192 |
 
 **Agent Anonymity**: Agents refer to each other only by role name. No model names, provider names, or API details appear in any prompt.
 
-**Thinking Model Handling**: Grok 4.1 and Kimi K2.5 may return `<think>...</think>` blocks. These are stripped via regex before downstream consumption.
+**Thinking Model Handling**: Grok 4.20 and Kimi K2.6 may return `<think>...</think>` blocks. These are stripped via regex before downstream consumption.
 
 **Output Constraints**: Each agent targets a 200-word limit. Responses exceeding 250 words trigger a warning but are not truncated.
 

@@ -9,10 +9,10 @@ class ModelRegistry:
     
     def __init__(self):
         self.models = {
-            "claude-opus-4-6": {
+            "claude-opus-4-7": {
                 "provider": "anthropic",
-                "model_id": "claude-opus-4-6",
-                "display_name": "Claude Opus 4.6",
+                "model_id": "claude-opus-4-7",
+                "display_name": "Claude Opus 4.7",
                 "api_key_env": "ANTHROPIC_API_KEY"
             },
             "claude-sonnet-4-6": {
@@ -21,10 +21,10 @@ class ModelRegistry:
                 "display_name": "Claude Sonnet 4.6",
                 "api_key_env": "ANTHROPIC_API_KEY"
             },
-            "grok-4-1-thinking": {
+            "grok-4.20-reasoning": {
                 "provider": "openai_compat",
-                "model_id": "grok-4-1-fast-reasoning",
-                "display_name": "Grok 4.1 (Thinking)",
+                "model_id": "grok-4.20-0309-reasoning",
+                "display_name": "Grok 4.20 (Reasoning)",
                 "base_url": "https://api.x.ai/v1",
                 "api_key_env": "XAI_API_KEY",
                 "is_thinking_model": True,
@@ -37,24 +37,24 @@ class ModelRegistry:
                 "base_url": "https://api.z.ai/api/paas/v4/",
                 "api_key_env": "ZAI_API_KEY"
             },
-            "kimi-k2.5": {
+            "kimi-k2.6": {
                 "provider": "openai_compat",
-                "model_id": "kimi-k2.5",
-                "display_name": "Kimi K2.5",
+                "model_id": "kimi-k2.6",
+                "display_name": "Kimi K2.6",
                 "base_url": "https://api.moonshot.cn/v1",
                 "api_key_env": "MOONSHOT_API_KEY",
                 "is_thinking_model": True,
                 "max_tokens": 8192
             }
         }
-        
+
         # Map roles to models
         self.role_mapping = {
-            "portfolio_manager": "claude-opus-4-6",
+            "portfolio_manager": "claude-opus-4-7",
             "devil_advocate": "claude-sonnet-4-6",
-            "quant_researcher": "grok-4-1-thinking",
-            "sentiment_researcher": "glm-5",
-            "technical_researcher": "kimi-k2.5"
+            "quant_researcher": "glm-5",
+            "sentiment_researcher": "grok-4.20-reasoning",
+            "technical_researcher": "kimi-k2.6"
         }
     
     def get_model_for_role(self, role: str) -> str:

@@ -118,7 +118,7 @@ async def call_openai_compat_agent(
         response = client.chat.completions.create(**kwargs)
         msg = response.choices[0].message
         content = msg.content or ""
-        # Thinking models (e.g. Kimi K2.5) may put the answer in content
+        # Thinking models (e.g. Kimi K2.6) may put the answer in content
         # but leave it empty if reasoning_content consumed the token budget.
         # Fall back to reasoning_content so we don't return a blank report.
         if not content.strip():

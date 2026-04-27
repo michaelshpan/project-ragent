@@ -8,10 +8,10 @@ interface Props {
 }
 
 const SECTION_TITLES: Record<string, string> = {
-  quant: "Quantitative Valuation Research \u2014 Grok 4.1",
-  sentiment: "Sentiment Research \u2014 GLM-5",
-  technical: "Technical Signals Research \u2014 Kimi K2.5",
-  pm_decision: "Portfolio Manager Initial Decision \u2014 Claude Opus 4.6",
+  quant: "Quantitative Valuation Research \u2014 GLM-5",
+  sentiment: "Sentiment Research \u2014 Grok 4.20",
+  technical: "Technical Signals Research \u2014 Kimi K2.6",
+  pm_decision: "Portfolio Manager Initial Decision \u2014 Claude Opus 4.7",
   da_challenge: "Devil's Advocate Challenge \u2014 Claude Sonnet 4.6",
 };
 
@@ -39,7 +39,7 @@ export function FinalView({ state, onNewAnalysis }: Props) {
     <div className="final-view fade-in">
       <div className={`hero-decision ${isBuy ? "buy" : "sell"}`}>
         <h1>Final Investment Decision: {ticker}</h1>
-        <p className="hero-model">Claude Opus 4.6</p>
+        <p className="hero-model">Claude Opus 4.7</p>
         {currentPrice != null && (
           <p className="hero-price">Current Price: ${currentPrice.toFixed(2)}</p>
         )}

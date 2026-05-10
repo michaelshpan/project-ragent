@@ -1,11 +1,14 @@
 import { useState, useEffect } from "react";
+import { ModeToggle } from "./ModeToggle";
 
 interface Props {
   onSubmit: (ticker: string) => void;
   disabled: boolean;
+  demoMode: boolean;
+  onDemoModeChange: (v: boolean) => void;
 }
 
-export function TickerInput({ onSubmit, disabled }: Props) {
+export function TickerInput({ onSubmit, disabled, demoMode, onDemoModeChange }: Props) {
   const [value, setValue] = useState("");
   const [usage, setUsage] = useState<{ count: number; limit: number; remaining: number } | null>(null);
 
@@ -45,6 +48,7 @@ export function TickerInput({ onSubmit, disabled }: Props) {
           Analyze
         </button>
       </form>
+      <ModeToggle demoMode={demoMode} onChange={onDemoModeChange} disabled={disabled} />
       {usage && (
         <UsageCounter count={usage.count} limit={usage.limit} />
       )}

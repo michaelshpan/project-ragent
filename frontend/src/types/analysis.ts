@@ -8,6 +8,16 @@ export type Stage =
   | "complete"
   | "error";
 
+export interface DebugInfo {
+  model_id?: string;
+  display_name?: string;
+  system_prompt?: string;
+  user_prompt?: string;
+  thinking?: string | null;
+  duration_ms?: number;
+  error?: string;
+}
+
 export interface SSEEvent {
   event: string;
   stage?: string;
@@ -21,6 +31,8 @@ export interface SSEEvent {
   source_log?: SourceEntry[];
   all_reports?: AllReports;
   data_summaries?: Record<string, string>;
+  debug?: DebugInfo;
+  all_debug?: Record<string, DebugInfo>;
 }
 
 export interface SourceEntry {
@@ -53,6 +65,8 @@ export interface AnalysisState {
   allReports: AllReports | null;
   elapsed: number;
   error: string | null;
+  demoMode: boolean;
+  debug: Record<string, DebugInfo>;
 }
 
 export const INITIAL_STATE: AnalysisState = {
@@ -69,4 +83,6 @@ export const INITIAL_STATE: AnalysisState = {
   allReports: null,
   elapsed: 0,
   error: null,
+  demoMode: false,
+  debug: {},
 };

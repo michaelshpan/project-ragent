@@ -30,7 +30,7 @@ def build_sentiment_researcher_prompt(ticker: str) -> str:
 
 Your task: Produce a concise research report (200-word limit) based on the provided data.
 
-Focus on: analyst sentiment, recent news themes, institutional positioning signals, risk narratives from search results, analyst estimates vs actual performance, and price target trends. Assess whether market sentiment is bullish, bearish, or mixed.
+Focus on: analyst sentiment, real-time sentiment from X, recent news themes, institutional positioning signals, risk narratives from search results, analyst estimates vs actual performance, and price target trends. Assess whether market sentiment is bullish, bearish, or mixed.
 
 Your report MUST include:
 1. Key findings from your analysis

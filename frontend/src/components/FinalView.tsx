@@ -1,5 +1,6 @@
 import { renderMarkdown } from "../utils/markdown";
 import { downloadMarkdown, buildFullReport } from "../utils/download";
+import { DebugPanel } from "./DebugPanel";
 import type { AnalysisState, SourceEntry } from "../types/analysis";
 
 interface Props {
@@ -8,11 +9,11 @@ interface Props {
 }
 
 const SECTION_TITLES: Record<string, string> = {
-  quant: "Quantitative Valuation Research \u2014 GLM-5",
-  sentiment: "Sentiment Research \u2014 Grok 4.20",
-  technical: "Technical Signals Research \u2014 Kimi K2.6",
-  pm_decision: "Portfolio Manager Initial Decision \u2014 Claude Opus 4.7",
-  da_challenge: "Devil's Advocate Challenge \u2014 Claude Sonnet 4.6",
+  quant: "Quantitative Valuation Research — GLM-5",
+  sentiment: "Sentiment Research — Grok 4.20",
+  technical: "Technical Signals Research — Kimi K2.6",
+  pm_decision: "Portfolio Manager Initial Decision — Claude Opus 4.7",
+  da_challenge: "Devil's Advocate Challenge — Claude Sonnet 4.6",
 };
 
 function downloadSection(title: string, content: string, ticker: string) {
@@ -21,7 +22,17 @@ function downloadSection(title: string, content: string, ticker: string) {
 }
 
 export function FinalView({ state, onNewAnalysis }: Props) {
-  const { finalDecision, allReports, dataSummaries, sourceLog, ticker, elapsed, currentPrice } = state;
+  const {
+    finalDecision,
+    allReports,
+    dataSummaries,
+    sourceLog,
+    ticker,
+    elapsed,
+    currentPrice,
+    demoMode,
+    debug,
+  } = state;
   if (!finalDecision) return null;
 
   // Determine BUY/SELL from the "Decision: BUY/SELL" line in final decision text
@@ -49,6 +60,11 @@ export function FinalView({ state, onNewAnalysis }: Props) {
           dangerouslySetInnerHTML={{ __html: renderMarkdown(finalDecision) }}
         />
         <p className="hero-elapsed">Completed in {elapsed}s</p>
+        {demoMode && (
+          <div className="hero-debug">
+            <DebugPanel debug={debug.final_decision} done />
+          </div>
+        )}
       </div>
 
       <div className="download-toolbar">
@@ -72,6 +88,7 @@ export function FinalView({ state, onNewAnalysis }: Props) {
               <details key={key} className="report-details">
                 <summary>{SECTION_TITLES[key]}</summary>
                 <div className="markdown-body" dangerouslySetInnerHTML={{ __html: renderMarkdown(content) }} />
+                {demoMode && <DebugPanel debug={debug[key]} done />}
                 <button
                   className="download-section-btn"
                   onClick={() => downloadSection(SECTION_TITLES[key], content, ticker)}

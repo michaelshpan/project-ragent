@@ -23,6 +23,7 @@ _active_tickers: set[str] = set()
 
 class AnalyzeRequest(BaseModel):
     ticker: str
+    demo_mode: bool = False
 
     @field_validator("ticker")
     @classmethod
@@ -62,7 +63,7 @@ async def analyze(req: AnalyzeRequest):
     async def event_stream():
         _active_tickers.add(ticker)
         try:
-            async for event in run_pipeline_web(ticker):
+            async for event in run_pipeline_web(ticker, demo_mode=req.demo_mode):
                 data = json.dumps(event, default=str)
                 yield f"event: {event['event']}\ndata: {data}\n\n"
         finally:

@@ -3,6 +3,7 @@ import { LoadingStep } from "./LoadingStep";
 import { DataSummary } from "./DataSummary";
 import { AgentReport } from "./AgentReport";
 import { DecisionCard } from "./DecisionCard";
+import { DebugPanel } from "./DebugPanel";
 import { FinalView } from "./FinalView";
 import { ErrorDisplay } from "./ErrorDisplay";
 
@@ -12,7 +13,7 @@ interface Props {
 }
 
 export function StepDisplay({ state, onNewAnalysis }: Props) {
-  const { stage } = state;
+  const { stage, demoMode, debug } = state;
 
   if (stage === "error") {
     return <ErrorDisplay message={state.error ?? "Unknown error"} onRetry={onNewAnalysis} />;
@@ -22,12 +23,15 @@ export function StepDisplay({ state, onNewAnalysis }: Props) {
     return <FinalView state={state} onNewAnalysis={onNewAnalysis} />;
   }
 
+  const researchHasReports = Object.keys(state.agentReports).length > 0;
+
   return (
     <div className="step-display">
       <h2 className="analyzing-ticker">Analyzing {state.ticker}</h2>
       {state.currentPrice != null && (
         <p className="current-price">Current Price: ${state.currentPrice.toFixed(2)}</p>
       )}
+      {demoMode && <div className="demo-mode-badge">Demo mode</div>}
 
       {/* Data fetch phase */}
       {stage === "data_fetch" && !state.dataSummaries && (
@@ -37,36 +41,63 @@ export function StepDisplay({ state, onNewAnalysis }: Props) {
         <DataSummary summaries={state.dataSummaries} />
       )}
 
-      {/* Research phase */}
-      {stage === "research" && Object.keys(state.agentReports).length === 0 && (
+      {/* Research phase — demo mode always renders all 3 slots so prompts show pre-call */}
+      {stage === "research" && demoMode && (
+        <AgentReport reports={state.agentReports} demoMode debug={debug} />
+      )}
+      {stage === "research" && !demoMode && !researchHasReports && (
         <LoadingStep message={state.message} />
       )}
-      {Object.keys(state.agentReports).length > 0 && stage === "research" && (
+      {stage === "research" && !demoMode && researchHasReports && (
         <AgentReport reports={state.agentReports} />
       )}
 
       {/* PM decision phase */}
-      {stage === "pm_decision" && !state.pmDecision && (
-        <LoadingStep message={state.message} />
+      {stage === "pm_decision" && state.pmDecision && (
+        <DecisionCard
+          title="Portfolio Manager Decision"
+          content={state.pmDecision}
+          demoMode={demoMode}
+          debug={debug.pm_decision}
+        />
       )}
-      {state.pmDecision && stage === "pm_decision" && (
-        <DecisionCard title="Portfolio Manager Decision" content={state.pmDecision} />
+      {stage === "pm_decision" && !state.pmDecision && (
+        <>
+          {demoMode && <DebugPanel debug={debug.pm_decision} done={false} />}
+          <LoadingStep message={state.message} />
+        </>
       )}
 
       {/* DA challenge phase */}
-      {stage === "da_challenge" && !state.daChallenge && (
-        <LoadingStep message={state.message} />
+      {stage === "da_challenge" && state.daChallenge && (
+        <DecisionCard
+          title="Devil's Advocate Challenge"
+          content={state.daChallenge}
+          demoMode={demoMode}
+          debug={debug.da_challenge}
+        />
       )}
-      {state.daChallenge && stage === "da_challenge" && (
-        <DecisionCard title="Devil's Advocate Challenge" content={state.daChallenge} />
+      {stage === "da_challenge" && !state.daChallenge && (
+        <>
+          {demoMode && <DebugPanel debug={debug.da_challenge} done={false} />}
+          <LoadingStep message={state.message} />
+        </>
       )}
 
       {/* Final decision phase */}
-      {stage === "final_decision" && !state.finalDecision && (
-        <LoadingStep message={state.message} />
+      {stage === "final_decision" && state.finalDecision && (
+        <DecisionCard
+          title="Final Decision"
+          content={state.finalDecision}
+          demoMode={demoMode}
+          debug={debug.final_decision}
+        />
       )}
-      {state.finalDecision && stage === "final_decision" && (
-        <DecisionCard title="Final Decision" content={state.finalDecision} />
+      {stage === "final_decision" && !state.finalDecision && (
+        <>
+          {demoMode && <DebugPanel debug={debug.final_decision} done={false} />}
+          <LoadingStep message={state.message} />
+        </>
       )}
 
       <button onClick={onNewAnalysis} className="cancel-btn">

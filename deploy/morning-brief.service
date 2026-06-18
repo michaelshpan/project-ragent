@@ -1,0 +1,8 @@
+[Unit]
+Description=Weekday morning brief
+
+[Service]
+Type=oneshot
+WorkingDirectory=/workspace/project-ragent
+EnvironmentFile=/workspace/project-ragent/.env
+ExecStart=/usr/bin/env python /workspace/project-ragent/morning_brief.py

@@ -1,0 +1,10 @@
+[Unit]
+Description=Run weekday morning brief at 7:30 AM
+
+[Timer]
+OnCalendar=Mon..Fri 07:30
+Persistent=true
+Unit=morning-brief.service
+
+[Install]
+WantedBy=timers.target

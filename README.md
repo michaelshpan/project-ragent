@@ -241,3 +241,46 @@ Every external API call is logged with source name, data type, URL, and timestam
 - Historical analysis comparison (track decisions over time)
 - Portfolio-level analysis (multiple tickers, correlation)
 - Custom agent configuration (swap models, adjust prompts)
+
+## Weekday Morning Brief Automation
+
+This repository includes `morning_brief.py`, a small weekday automation that can summarize today's calendar events, unread IMAP email, and inferred items needing attention.
+
+### Configure
+
+Add these values to `.env` as needed:
+
+```bash
+MORNING_BRIEF_TZ=America/New_York
+MORNING_BRIEF_ICS_URLS=https://calendar.example/private.ics
+MORNING_BRIEF_IMAP_HOST=imap.example.com
+MORNING_BRIEF_IMAP_USERNAME=you@example.com
+MORNING_BRIEF_IMAP_PASSWORD=app-password
+MORNING_BRIEF_EMAIL_LIMIT=10
+
+# Optional email delivery; without this the brief prints to stdout/journal logs.
+MORNING_BRIEF_SMTP_HOST=smtp.example.com
+MORNING_BRIEF_SMTP_PORT=587
+MORNING_BRIEF_SMTP_USERNAME=you@example.com
+MORNING_BRIEF_SMTP_PASSWORD=app-password
+MORNING_BRIEF_FROM=you@example.com
+MORNING_BRIEF_TO=you@example.com
+```
+
+### Run manually
+
+```bash
+python morning_brief.py --date 2026-06-18 --force
+```
+
+### Install as a weekday systemd timer
+
+The provided unit files run the brief at 7:30 AM Monday through Friday:
+
+```bash
+sudo cp deploy/morning-brief.service deploy/morning-brief.timer /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now morning-brief.timer
+```
+
+Use `systemctl list-timers morning-brief.timer` to confirm the next run, and `journalctl -u morning-brief.service` to read stdout delivery logs.
